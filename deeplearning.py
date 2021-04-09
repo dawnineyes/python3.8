@@ -585,10 +585,14 @@ class Game_Timeline:
     # 根据 给的box, 在box中识别 lib_list中的图片 并转化未相应的字符
     # lib_list [ 图片，  找到图片后对应的字符 ]
     @staticmethod
-    def ocr(box, lib_list, show=False, confidence=0.95):
+    def ocr(box, lib_list, show=False, confidence=0.95, convert_2_=False, threshold=[160, 190]):
         pic = pyscreeze.screenshot(region=box)
         if show:
             pic.show()
+
+        if convert_2_:
+            pic = Game_Timeline.convert_2(pic, threshold=threshold)
+
         list = []
         for path_and_name in lib_list:
             path = path_and_name[0]
@@ -611,13 +615,31 @@ class Game_Timeline:
             return None
         return s
 
+    @staticmethod
+    def convert_2(img, threshold=[0, 255]):
+        img = img.convert('L')
+        min_ = threshold[0]
+        max_ = threshold[1]
+        table = []
+        for i in range(256):
+            if min_ <= i <= max_:
+                table.append(1)
+            else:
+                table.append(0)
+        # convert to binary image by the table
+        bim = img.point(table, '1')
+        return bim
+
     # todo 暂时无法精确识别代币   8  3  5  0 会识别错误
     @staticmethod
     def ocr_daibi():
         box = pyautogui.locateOnScreen('./client/daibi.png', confidence=0.95)
-        box = [box[0] + 2, box[1] + 60, box[2] - 4, 2]
-        # Game_Timeline.box_pic(box)
-        return Game_Timeline.str_to_int(Game_Timeline.ocr(box, daibi_lib_list, confidence=0.98))
+        if box is None:
+            return None
+        box = [box[0], box[1], 68, 68]
+
+        result = Game_Timeline.ocr(box, daibi_lib_list, show=False, convert_2_=True, threshold=[160, 190], confidence=0.80)
+        return Game_Timeline.str_to_int(result)
 
     @staticmethod
     def box_pic(box):

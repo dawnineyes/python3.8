@@ -1,9 +1,12 @@
 import os
 
+import numpy
 import pyautogui
 import time
 import pyscreeze
 import psutil
+from PIL import Image
+import cv2
 
 
 def get_win_hwnd(title):
@@ -29,6 +32,34 @@ def ocr(box, font_library_path, show=False):
     # todo
     for filename in os.listdir(font_library_path):
         points = tuple(pyscreeze.locateAll(font_library_path + filename, pic, confidence=0.97))
+        if len(points):
+            for point in points:
+                list.append((point[0], filename[:filename.rindex('.')]))
+    list.sort()
+    s = ''
+    for n in list:
+        s += str(n[1])
+    # num = None
+    try:
+        # num = int(s)
+        pic.fp.close()
+    except Exception:
+        pass
+    return s
+
+
+def ocr_2(box, font_library_path, show=False, threshold=[160, 190], confidence=0.8, pic_path=None):
+    if pic_path:
+        pic = Image.open(pic_path)
+    else:
+        pic = pyscreeze.screenshot(region=box)
+    pic = convert_2(pic, threshold)
+    if show:
+        pic.show()
+    list = []
+
+    for filename in os.listdir(font_library_path):
+        points = tuple(pyscreeze.locateAll(font_library_path + filename, pic, confidence=confidence))
         if len(points):
             for point in points:
                 list.append((point[0], filename[:filename.rindex('.')]))
@@ -133,8 +164,49 @@ class Hero:
 
 # get_win_hwnd('d')
 
-print(pyautogui.locateOnScreen('./gametimeline/hero_health_bar.png',confidence=0.99))
+# print(pyautogui.locateOnScreen('./gametimeline/hero_health_bar.png',confidence=0.99))
+# print(pyscreeze.locate(Image.open('./579.png'), Image.open('./daibi3.png')))
+# img = Image.open('./579.png')
+# print()
 
+
+def convert_2(img, threshold=[0, 255]):
+    # img = Image.open(img_path)
+    img = img.convert('L')
+    # img.show()
+    min_ = threshold[0]
+    max_ = threshold[1]
+
+    table = []
+    for i in range(256):
+        if min_ <= i <= max_:
+            table.append(1)
+        else:
+            table.append(0)
+
+    # convert to binary image by the table
+
+    bim = img.point(table, '1')
+    return bim
+
+
+#
+# pic = Image.open('./play.png')
+# pic.show()
+
+
+
+
+box = pyautogui.locateOnScreen('./client/daibi.png', confidence=0.95)
+if box:
+    box = [box[0], box[1], 68, 68]
+
+print(ocr_2(box, './client/daibi/', show=False, threshold=[160, 190], confidence=0.80
+            # ,pic_path='./21.png'
+            ))
+
+# Image.
+# convert_2(Image.open('./daibi2.png'), [140, 200])
 
 # pids = psutil.pids()
 # for pid in pids:
@@ -144,10 +216,6 @@ print(pyautogui.locateOnScreen('./gametimeline/hero_health_bar.png',confidence=0
 #
 #     print("Process name is: %s, pid is: %s" % (process_name, pid))
 
-
-time.sleep(2)
-while False:
-    pyautogui.click()
 
 # box = pyautogui.locateOnScreen('./gametimeline/title.png')
 # if box:
@@ -160,7 +228,6 @@ while False:
 #     print(len(result))
 #     for p in result:
 #         pyautogui.click(p.x + 25, p.y + 57)
-
 
 
 # a = set()
