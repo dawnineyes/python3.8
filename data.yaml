@@ -1,0 +1,11 @@
+#时间范围内自动打代币
+run_time:
+  - start_time: [ 0,0 ]
+    end_time: [ 23,59 ]
+#是否前4投降
+is_rank4_surrender: False
+#快速找牌 间隔5秒
+fast_find_interval: 5
+#是否打排位模式   True   False
+choose_rank: False
+is_pick_up: True
