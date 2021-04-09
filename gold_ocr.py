@@ -3,6 +3,7 @@ import os
 import pyautogui
 import time
 import pyscreeze
+import psutil
 
 
 def get_win_hwnd(title):
@@ -119,15 +120,59 @@ class Pos:
     # def __cmp__(self, other):
 
 
-a = set()
+class Hero:
+    def __init__(self, hero):
+        self.name = hero['name']
+        self.pic = './role/' + hero['name'] + '.png'
+        self.info = './roleinfo/' + hero['name'] + '.png'
 
-a.add(Pos(122, 10))
-a.add(Pos(132, 50))
-a.add(Pos(132, 15))
-a.add(Pos(132, 120))
-a.add(Pos(200, 17))
-for i in a:
-    print((i.x,i.y))
+        self.is_fight = False
+        self.watch = []
+        self.num = 0
+
+
+# get_win_hwnd('d')
+
+print(pyautogui.locateOnScreen('./gametimeline/hero_health_bar.png',confidence=0.99))
+
+
+# pids = psutil.pids()
+# for pid in pids:
+#     p = psutil.Process(pid)
+#     # get process name according to pid
+#     process_name = p.name()
+#
+#     print("Process name is: %s, pid is: %s" % (process_name, pid))
+
+
+time.sleep(2)
+while False:
+    pyautogui.click()
+
+# box = pyautogui.locateOnScreen('./gametimeline/title.png')
+# if box:
+#     fight_box = [box[0] + 128 - 100, box[1] + 158, 742, 305 + 150]
+#     # box_pic(fight_box)
+#     box_list = pyautogui.locateAllOnScreen('./gametimeline/hero_health_bar.png', region=fight_box, confidence=0.8)
+#     result = set()
+#     for b in box_list:
+#         result.add(Pos(b[0], b[1]))
+#     print(len(result))
+#     for p in result:
+#         pyautogui.click(p.x + 25, p.y + 57)
+
+
+
+# a = set()
+#
+# a.add(Pos(122, 10))
+# a.add(Pos(132, 50))
+# a.add(Pos(132, 15))
+# a.add(Pos(132, 120))
+# a.add(Pos(200, 17))
+# for i in a:
+#     print((i.x,i.y))
+
 
 # s = './asdasdas/asdasd/dashu.png'
 # print(s[s.rindex('/')+1:s.rindex('.')])

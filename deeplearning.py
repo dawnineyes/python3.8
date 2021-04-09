@@ -52,6 +52,26 @@ def activate_client():
         pass
 
 
+def close_game():
+    os.system('taskkill /IM "League of Legends.exe" /F')
+    os.system('taskkill /IM LeagueClient.exe /F')
+    os.system('taskkill /IM Client.exe /F')
+    os.system('taskkill /IM TenioDL.exe /F')
+    os.system('taskkill /IM TPHelper.exe /F')
+    os.system('taskkill /IM SGuard64.exe /F')
+    os.system('taskkill /IM SGuardSvc64.exe /F')
+
+
+def ckeck_time():
+    can_run = can_run_(datetime.datetime.now().time())
+    in_game = get_lol_client_hwnd() is not None
+    in_client = get_lol_hwnd() is not None
+    if not can_run and in_client:
+        # 如果还在客户端界面 结束游戏
+        close_game()
+        print('休息. ' + str(datetime.datetime.now().strftime("%Y--%m--%d %H:%M:%S")))
+
+
 def box_center_x_y(box):
     return box[0] + int(box[2] / 2), box[1] + int(box[3] / 2)
 
@@ -257,9 +277,9 @@ def open_game(lol_hwnd=None, wait_time=30, region=None):
 
 
 def gg_game_(hero_list, game_timeline, max_click=99999, region=None):
-    click(929 + game_timeline.client_box[0] + random.randint(0, 20),
-          638 + game_timeline.client_box[1] + random.randint(-10, 10))
-    time.sleep(0.3)
+    # click(929 + game_timeline.client_box[0] + random.randint(0, 20),
+    #       638 + game_timeline.client_box[1] + random.randint(-10, 10))
+    # time.sleep(0.3)
     click_num = find_hero(hero_list, max_click, region=game_timeline.find_hero_box)
     return click_num
 
@@ -911,38 +931,26 @@ num = 1
 
 while True:
     while autoPaly:
+        ckeck_time()
+
         activate_client()
-        if can_run_(datetime.datetime.now().time()):
-            pass
-        else:
-            # 不能运行  休息
-            print('休息. ' + str(datetime.datetime.now().strftime("%Y--%m--%d %H:%M:%S")))
-            os.system('taskkill /IM "League of Legends.exe" /F')
-            os.system('taskkill /IM LeagueClient.exe /F')
-            os.system('taskkill /IM Client.exe /F')
-            time.sleep(3)
-            os.system('taskkill /IM TenioDL.exe /F')
-            os.system('taskkill /IM TPHelper.exe /F')
-            os.system('taskkill /IM SGuard64.exe /F')
-            os.system('taskkill /IM SGuardSvc64.exe /F')
-            # keep_online_click()
-            time.sleep(5)
-            break
 
         # 判断进入哪个分支
         #     open_game()
         time.sleep(1)
         pic_click_one('./gametimeline/OK.png', confidence=0.7)
-        print('检测游戏状态')
+        print('status')
         if pic_exists('./gametimeline/mark_waiting_game.png', confidence=0.7):
             print('open_game')
             open_game(lol_hwnd=get_lol_hwnd())
         elif pic_exists('./gametimeline/In_game_logo.png', confidence=0.7):
             init_Formation()
-            print('play_game = ' + str(num))
+            print('play_game = %d' % num, end=' ')
             print(datetime.datetime.now().strftime("%Y--%m--%d %H:%M:%S"))
             Game_Timeline(hero_list_init(), add_list_init(), normal_game_execute_list).run()
             num = num + 1
+        elif get_lol_client_hwnd() is not None:
+            print('loading')
         else:
             pic_click_one('./gametimeline/OK.png', confidence=0.7)
 
