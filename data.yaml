@@ -1,6 +1,6 @@
 #时间范围内自动打代币
 run_time:
-  - start_time: [ 0,0 ]
+  - start_time: [0,0 ]
     end_time: [ 23,59 ]
 #是否前4投降
 is_rank4_surrender: False

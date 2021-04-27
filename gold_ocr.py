@@ -190,20 +190,52 @@ def convert_2(img, threshold=[0, 255]):
     return bim
 
 
+def check_hero(box):
+    box_list = pyautogui.locateAllOnScreen('./gametimeline/hero_health_bar.png', region=box, confidence=0.8)
+    result = set()
+    for b in box_list:
+        result.add(Pos(b[0], b[1]))
+    print(len(result))
+    for p in result:
+        pyautogui.mouseDown(p.x + 25, p.y + 53, button='right', duration=0.1)
+        pyautogui.mouseUp(p.x + 25, p.y + 53, button='right', duration=0.1)
+        time.sleep(0.7)
+
+
+def click(x, y):
+    pyautogui.mouseDown(x, y, duration=0.1)
+    pyautogui.mouseUp(x, y, duration=0.1)
+
+time.sleep(2)
+
+
+    # time.sleep(3)
+# print(pyautogui.locateOnScreen('./role/T-xinghong.png', confidence=0.95))
+# li = []
+# for i in [965, 593], [921, 537], [964, 489], [1053, 593], [1005, 537], [1047, 489]:
+#     li.append([i[0]-445,i[1]-121])
+# print(li)
+# box = pyautogui.locateOnScreen('./gametimeline/searching_game.png', confidence=0.7)
+# print(box)
+# if box:
+#     click(box[0] + 202, box[1] + 14)
+#     time.sleep(1)
+#     click(box[0] + 202, box[1] + 14)
+#     click(box[0] + 202, box[1] + 14)
+
+
 #
 # pic = Image.open('./play.png')
 # pic.show()
 
 
-
-
-box = pyautogui.locateOnScreen('./client/daibi.png', confidence=0.95)
-if box:
-    box = [box[0], box[1], 68, 68]
-
-print(ocr_2(box, './client/daibi/', show=False, threshold=[160, 190], confidence=0.80
-            # ,pic_path='./21.png'
-            ))
+# box = pyautogui.locateOnScreen('./client/daibi.png', confidence=0.95)
+# if box:
+#     box = [box[0], box[1], 68, 68]
+#
+# print(ocr_2(box, './client/daibi/', show=False, threshold=[160, 190], confidence=0.80
+#             # ,pic_path='./21.png'
+#             ))
 
 # Image.
 # convert_2(Image.open('./daibi2.png'), [140, 200])
@@ -217,18 +249,16 @@ print(ocr_2(box, './client/daibi/', show=False, threshold=[160, 190], confidence
 #     print("Process name is: %s, pid is: %s" % (process_name, pid))
 
 
+# get_lol_client_hwnd().restore()
+# get_lol_client_hwnd().activate()
+# time.sleep(1)
+
 # box = pyautogui.locateOnScreen('./gametimeline/title.png')
 # if box:
-#     fight_box = [box[0] + 128 - 100, box[1] + 158, 742, 305 + 150]
-#     # box_pic(fight_box)
-#     box_list = pyautogui.locateAllOnScreen('./gametimeline/hero_health_bar.png', region=fight_box, confidence=0.8)
-#     result = set()
-#     for b in box_list:
-#         result.add(Pos(b[0], b[1]))
-#     print(len(result))
-#     for p in result:
-#         pyautogui.click(p.x + 25, p.y + 57)
-
+#     fight_box = [box[0] + 28, box[1] + 158, 890, 305]
+#     watch_box = [box[0] + 28, box[1] + 158 + 305, 890, 150]
+#     check_hero(fight_box)
+#     check_hero(watch_box)
 
 # a = set()
 #

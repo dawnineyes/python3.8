@@ -56,6 +56,9 @@ def close_game():
     os.system('taskkill /IM "League of Legends.exe" /F')
     os.system('taskkill /IM LeagueClient.exe /F')
     os.system('taskkill /IM Client.exe /F')
+
+
+def close_tp():
     os.system('taskkill /IM TenioDL.exe /F')
     os.system('taskkill /IM TPHelper.exe /F')
     os.system('taskkill /IM SGuard64.exe /F')
@@ -63,12 +66,14 @@ def close_game():
 
 
 def ckeck_time():
-    can_run = can_run_(datetime.datetime.now().time())
+    # 在游戏中 什么都不做
     in_game = get_lol_client_hwnd() is not None
-    in_client = get_lol_hwnd() is not None
-    if not can_run and in_client:
-        # 如果还在客户端界面 结束游戏
+    if in_game:
+        return False
+    can_run = can_run_(datetime.datetime.now().time())
+    if not can_run:
         close_game()
+        close_tp()
         print('休息. ' + str(datetime.datetime.now().strftime("%Y--%m--%d %H:%M:%S")))
 
 
@@ -112,17 +117,25 @@ def click(x, y, button='left', duration=0.1):
     # 'left', 'middle', 'right'
     x += dec
     y += dec
-    moveTo(x, y)
+    # moveTo(x, y, duration=0.2)
     pyautogui.mouseDown(x, y, button=button, duration=duration)
-    pyautogui.mouseUp(x, y, button=button, duration=duration)
+    time.sleep(0.1)
+    pyautogui.mouseUp(button=button)
 
 
 def right_click(x, y, duration=0.2):
     click(x, y, button='right', duration=duration)
 
 
+def locate(image, screenshotIm, **kwargs):
+    points = locateAllOnScreen(image, screenshotIm, **kwargs)
+    if len(points) > 0:
+        return points[0]
+    return None
+
+
 def locateAllOnScreen(image, screenshotIm, **kwargs):
-    retVal = pyscreeze.locateAll(image, screenshotIm, **kwargs)
+    retVal = tuple(pyscreeze.locateAll(image, screenshotIm, **kwargs))
     return retVal
 
 
@@ -270,10 +283,15 @@ def open_game(lol_hwnd=None, wait_time=30, region=None):
     if find:
         start_time = time.time()
         while time.time() - start_time < wait_time:
+            time.sleep(2)
             x, y = pic_click_one('./gametimeline/accept.png', confidence=0.7, region=region)
             if x and y:
                 return True
-            time.sleep(2)
+    box = pyautogui.locateOnScreen('./gametimeline/searching_game.png', confidence=0.7)
+    if box is not None:
+        for i in range(3):
+            click(box[0] + 202, box[1] + 14)
+            time.sleep(0.5)
 
 
 def gg_game_(hero_list, game_timeline, max_click=99999, region=None):
@@ -304,11 +322,11 @@ class Pos:
         self.y = y
 
     def __eq__(self, other):
-        return abs(self.x - other.x) < 30 and abs(self.y - other.y) < 20
+        return abs(self.x - other.x) < 30 and abs(self.y - other.y) < 10
 
     def __lt__(self, other):
         if abs(self.x - other.x) < 30:
-            return self.y + 20 < other.y
+            return self.y + 10 < other.y
         return self.x + 30 < other.x
 
     def __hash__(self):
@@ -324,16 +342,20 @@ class Game:
         self.func = func
         self.keep_func = keep_func
 
-    def exists_template(self, region=None):
-        if pic_exists(self.pic_path, confidence=0.95, region=region):
-            return True
-        return False
+    def exists_template(self, game_timeline):
+        # if pic_exists(self.pic_path, confidence=0.95, region=region):
+        return self.name == game_timeline.draft
 
     #     return True:继续执行   False：游戏结束
     def run(self, game_timeline):
         print('wait ' + str(self.name))
         is_ready = False
         while True:
+
+            if stop:
+                time.sleep(1)
+                continue
+
             time.sleep(1)
             # 超过时间投降
             if game_timeline.is_time_out():
@@ -353,24 +375,30 @@ class Game:
             # 识别等级
             game_timeline.update_level()
             # 识别回合
-            game_timeline.update_draft()
+            if game_timeline.update_draft() is not None:
+                if game_timeline.draft >= 26:
+                    game_timeline.check_watch_hero()
+
+            if game_timeline.draft > self.name:
+                return True
 
             # 找5费英雄
-            if game_timeline.gold > 10 and game_timeline.find_finish():
-                pic_click_one('./role/fee5.png', region=game_timeline.find_hero_box)
+            pic_click_all('./role/fee5.png', region=game_timeline.find_hero_box)
+            if game_timeline.gold >= 30 and game_timeline.level >= 8 and game_timeline.find_finish():
+                refresh_shop()
+                pic_click_all('./role/fee5.png', region=game_timeline.find_hero_box)
 
             self.keep_do(game_timeline)
 
-            if self.exists_template(region=game_timeline.client_box):
+            if self.exists_template(game_timeline):
                 self.do(game_timeline)
                 return True
-
-            gg_game_(game_timeline.hero_list, game_timeline)
+            if game_timeline.gold >= 5:
+                gg_game_(game_timeline.hero_list, game_timeline)
             game_timeline.check_list()
-            if game_timeline.is_base_init():
-                game_timeline.pick_up()
-            for i in range(2):
-                game_timeline.swipe()
+            # if game_timeline.is_base_init():
+            game_timeline.pick_up()
+            game_timeline.swipe_sec()
 
     def do(self, game_timeline):
         self.func(game_timeline)
@@ -429,8 +457,10 @@ class Game_Timeline:
         self.is_pick_up = data['is_pick_up']
         self.last_pick_up_time = 0
 
-        # 英雄详情信息  todo 目前弃用
+        # 英雄详情信息
         self.hero_info_list = hero_info_list
+
+        self.hero_star_list = [0] * 20
 
         # 上装备  相关
         self.props_index = 0
@@ -482,12 +512,12 @@ class Game_Timeline:
 
     def pick_up(self):
         # 3分钟 捡一次道具
-        if self.is_pick_up and time.time() - self.last_pick_up_time > 10:
-            # jian_()
+        if self.is_pick_up and time.time() - self.last_pick_up_time > 5:
             pic_click_one('./gametimeline/pick.png', button='right', confidence=0.7, region=self.client_box)
             pic_click_one('./gametimeline/pick2.png', button='right', confidence=0.7, region=self.client_box)
             pic_click_one('./gametimeline/pick3.png', button='right', confidence=0.7, region=self.client_box)
-            pic_click_one('./gametimeline/pick4.png', button='right', confidence=0.7, region=self.client_box)
+            pic_click_one('./gametimeline/pick4.png', button='right', confidence=0.8, region=self.client_box)
+            pic_click_one('./gametimeline/pick5.png', button='right', confidence=0.8, region=self.client_box)
             self.last_pick_up_time = time.time()
             # self.swipe_props(enforce=True)
             time.sleep(1)
@@ -562,7 +592,14 @@ class Game_Timeline:
         return self.find_finish_list[0]
 
     def find_finish(self):
-        return self.find_finish_list[self.add_x_end]
+        for i in range(len(self.hero_list)):
+            if self.hero_star_list[i] < 2:
+                # todo
+                if self.hero_list[i][1] <= 0:
+                    self.hero_list[i][1] += 1
+                return False
+        return True
+        # return self.find_finish_list[self.add_x_end]
 
     def is_game_over(self):
         x, y = pic_click_one('./gametimeline/drop_out.png', region=self.client_box)
@@ -580,6 +617,81 @@ class Game_Timeline:
                y=props_xy_list[self.props_index][1] + self.client_box[1])
         dragTo(hero_x, hero_y)
         self.props_index = (self.props_index + 1) % len(props_xy_list)
+
+    def swipe_sec(self):
+        if time.time() - self.last_swipe_props_time > 35:
+            for i in range(6):
+                self.swipe()
+            self.last_swipe_props_time = time.time()
+
+    # ----------------------------------------------------------------------------------------------
+    # 校验英雄
+    def check_hero(self, box):
+        box_list = pyautogui.locateAllOnScreen('./gametimeline/hero_health_bar.png', region=box, confidence=0.75)
+        result = set()
+        for b in box_list:
+            result.add(Pos(b[0], b[1]))
+        for pos in result:
+            self.click_space()
+            x, y = pos.x + 25, pos.y + 53
+            pyautogui.mouseDown(x, y, button='right', duration=0.1)
+            pyautogui.mouseUp(button='right')
+            time.sleep(0.4)
+            star_index = self.find_hero_info()
+            if star_index is None:
+                self.sell_hero(x, y)
+            else:
+                # 没有info界面
+                if star_index[0] == 0:
+                    pass
+                else:
+                    star = star_index[0]
+                    index = star_index[1]
+                    if star < self.hero_star_list[index]:
+                        self.sell_hero(x, y)
+                    self.hero_star_list[index] = max(self.hero_star_list[index], star)
+                    if index < len(fighting_hero_xy_list):
+                        dragTo(self.client_box[0] + fighting_hero_xy_list[index][0],
+                               self.client_box[1] + fighting_hero_xy_list[index][1])
+        self.click_space()
+
+    def find_hero_info(self):
+        screenshotIm = pyscreeze.screenshot(region=None)
+        star = self.find_star(screenshotIm)
+        if star is None:
+            # 没找到星级  表示没有info界面  不能判断是否卖掉英雄  只能返回true
+            return [0, -1]
+        index = 0
+        for hero_info in self.hero_info_list:
+            pos = locate(hero_info, screenshotIm, region=self.client_box)
+            if pos is not None:
+                return [star, index]
+            index += 1
+        try:
+            screenshotIm.fp.close()
+        except AttributeError:
+            pass
+        return None
+
+    def find_star(self, screenshotIm):
+        for i in range(1, 4):
+            star = locate('./gametimeline/star' + str(i) + '.png', screenshotIm, region=self.client_box)
+            if star is not None:
+                return i
+        return None
+
+    def find_health_bar(self):
+        box_list = list(pyautogui.locateAllOnScreen('./gametimeline/hero_health_bar.png',
+                                                    region=self.client_box, confidence=0.8))
+        result = set()
+        for box in box_list:
+            result.add(Pos(box[0], box[1]))
+        return result
+
+    def check_watch_hero(self):
+        fight_box = [self.client_box[0] + 28, self.client_box[1] + 158, 890, 305]
+        watch_box = [self.client_box[0] + 28, self.client_box[1] + 158 + 305, 890, 150]
+        self.check_hero(self.client_box)
 
     # ----------------------------------------------------------------------------------------------
     # 根据 给的box, 在box中识别 lib_list中的图片 并转化未相应的字符
@@ -630,7 +742,6 @@ class Game_Timeline:
         bim = img.point(table, '1')
         return bim
 
-    # todo 暂时无法精确识别代币   8  3  5  0 会识别错误
     @staticmethod
     def ocr_daibi():
         box = pyautogui.locateOnScreen('./client/daibi.png', confidence=0.95)
@@ -638,7 +749,8 @@ class Game_Timeline:
             return None
         box = [box[0], box[1], 68, 68]
 
-        result = Game_Timeline.ocr(box, daibi_lib_list, show=False, convert_2_=True, threshold=[160, 190], confidence=0.80)
+        result = Game_Timeline.ocr(box, daibi_lib_list, show=False, convert_2_=True, threshold=[160, 190],
+                                   confidence=0.80)
         return Game_Timeline.str_to_int(result)
 
     @staticmethod
@@ -673,10 +785,10 @@ class Game_Timeline:
                 self.level = lv
                 print('level: %d.' % self.level)
                 # 到达等级7  清空watch
-                if self.level >= 7:
-                    for pos in watch_hero_xy_list:
-                        self.sell_hero(self.client_box[0] + pos[0], self.client_box[1] + pos[1])
-                        time.sleep(0.3)
+                # if self.level >= 7:
+                #     for pos in watch_hero_xy_list:
+                #         self.sell_hero(self.client_box[0] + pos[0], self.client_box[1] + pos[1])
+                #         time.sleep(0.3)
         return self.level
 
     def ocr_level(self):
@@ -692,12 +804,13 @@ class Game_Timeline:
                 self.draft = d
                 time.sleep(2)
                 print('draft: %d-%d ' % (int(self.draft / 10), int(self.draft % 10)))
-                print('新回合', end=' ')
-                self.right_click_watch()
-        return self.draft
+                # print('新回合', end=' ')
+                # self.right_click_watch()
+                return self.draft
+        return None
 
     def ocr_draft(self):
-        draft_box = [self.client_box[0] + 365, self.client_box[1] + 25, 35, 27]
+        draft_box = [self.client_box[0] + 365, self.client_box[1] + 25, 76, 27]
         return self.ocr(draft_box, draft_lib_list)
 
     @staticmethod
@@ -744,8 +857,12 @@ class Game_Timeline:
             y = watch_hero_xy_list[index][1] + self.client_box[1]
             right_click(x, y)
             time.sleep(0.5)
-        click(self.client_box[0] + 50,
-              self.client_box[1] + 50, )
+            self.click_space()
+
+    def click_space(self, right=False):
+        click(self.client_box[0] + 140, self.client_box[1] + 460)
+        if right:
+            click(self.client_box[0] + 140, self.client_box[1] + 460, button='right')
 
     # -----------------------------------------------------------------------------------------------------------
     @staticmethod
@@ -753,7 +870,7 @@ class Game_Timeline:
         pyautogui.mouseDown(x, y, button='left', duration=0.2)
         slow_key_press('e')
         time.sleep(0.1)
-        pyautogui.mouseUp()
+        pyautogui.mouseUp(button='left')
 
 
 def can_run_(current_time):
@@ -770,7 +887,15 @@ def change_game_status():
     return autoPaly
 
 
+def stop_game():
+    global stop
+    stop = not stop
+    print('%s.' % ['running', 'stop'][stop])
+    return stop
+
+
 keyboard.add_hotkey('F12', change_game_status)
+keyboard.add_hotkey('F11', stop_game)
 
 
 def func_keep_find(game_timeline):
@@ -797,36 +922,47 @@ def func_wait_game_over(game_timeline):
     pic_click_one("gametimeline/drop_out.png")
 
 
+def func_1_3_normal(game_timeline):
+    pic_click_one('./role/fee1.png')
+
+
+def func_2_1_normal(game_timeline):
+    # if len(game_timeline.find_health_bar()) < 3:
+    # pic_click_one('./role/fee1.png')
+    pass
+
+
 def func_2_5_normal(game_timeline):
     time.sleep(2)
-    clear_offline_role_1(game_timeline)
+    # clear_offline_role_1(game_timeline)
 
 
 def func_2_7_normal(game_timeline):
     time.sleep(2)
-    clear_online_role_1(game_timeline)
+    # clear_online_role_1(game_timeline)
     upgrade_champ()
-    gg_game_(game_timeline.hero_list, game_timeline)
-    refresh_shop()
-    gg_game_(game_timeline.hero_list, game_timeline)
+    # gg_game_(game_timeline.hero_list, game_timeline)
+    # refresh_shop()
+    # gg_game_(game_timeline.hero_list, game_timeline)
 
 
 def func_3_3_normal(game_timeline):
     time.sleep(2)
     upgrade_champ()
     upgrade_champ()
-    upgrade_champ()
-    upgrade_champ()
-    gg_game_(game_timeline.hero_list, game_timeline)
-    refresh_shop()
-    gg_game_(game_timeline.hero_list, game_timeline)
-    time.sleep(70)
+    # upgrade_champ()
+    # upgrade_champ()
+    # gg_game_(game_timeline.hero_list, game_timeline)
+    # refresh_shop()
+    # gg_game_(game_timeline.hero_list, game_timeline)
+    # time.sleep(70)
     pass
 
 
 def func_3_5_normal(game_timeline):
     time.sleep(2)
-    clear_offline_role_1(game_timeline)
+    upgrade_champ()
+    # clear_offline_role_1(game_timeline)
     pass
 
 
@@ -869,6 +1005,8 @@ rest_list = [
 ]
 
 normal_game_execute_list = [
+    Game('./gametimeline/game_1_3.png', 13, func_1_3_normal, func_keep_find),
+    Game('./gametimeline/game_2_1.png', 21, func_2_1_normal, func_keep_find),
     Game('./gametimeline/game_2_5.png', 25, func_2_5_normal, func_keep_find),
     Game('./gametimeline/game_2_7.png', 27, func_2_7_normal, func_keep_find),
     Game('./gametimeline/game_3_3.png', 33, func_3_3_normal, func_keep_find),
@@ -904,15 +1042,15 @@ def init_Formation():
     Formation = fm
 
 
-hero_num_list = [1, 1, 1, 1, 1, 1]
+# hero_num_list = [1, 1, 1, 1, 1, 1]
 
 
-# hero_num_list = [3, 3, 3, 3, 3, 3]
+hero_num_list = [3, 3, 3, 3, 3, 3]
 
 
 def add_list_init():
-    return [[2, 2, 2, 2, 2, 2]]
-    # return [[0, 0, 0, 0, 0, 0]]
+    # return [[2, 2, 2, 2, 2, 2]]
+    return [[0, 0, 0, 0, 0, 0]]
 
 
 def hero_list_init():
@@ -924,6 +1062,15 @@ def hero_list_init():
     return hero_list
 
 
+def hero_info_list_init():
+    hero_info_list = []
+    for hero_name in Formation:
+        hero_info_list.append('./role/roleinfo/' + hero_name + '.png')
+    hero_info_list.append('./role/roleinfo/fee5.png')
+    hero_info_list.append('./role/roleinfo/fee14.png')
+    return hero_info_list
+
+
 # watch_hero_xy_list = [
 #     [576, 660], [662, 660], [743, 660], [827, 660], [908, 660]
 #     , [992, 660], [1075, 660], [1156, 660], [1239, 660]
@@ -933,9 +1080,9 @@ def hero_list_init():
 watch_hero_xy_list = [[124, 549], [215, 549], [301, 549], [385, 549], [466, 549], [550, 549], [633, 549], [717, 549],
                       [800, 549]]
 
-fighting_hero_xy_list = [[518, 472], [475, 419], [519, 365], [610, 474]]
+fighting_hero_xy_list = [[518, 472], [475, 419], [519, 365], [610, 474], [560, 416], [602, 368]]
 props_xy_list = [
-    [44, 567], [55, 544], [53, 529], [80, 507], [65, 475],
+    [44, 567], [50, 544], [50, 529], [80, 507], [65, 475],
     # [120, 506],   可能会点到英雄
     [104, 475],
     [71, 460], [111, 460], [142, 475]
@@ -943,7 +1090,7 @@ props_xy_list = [
 
 # ------------------------------------------------------------------------------------------------------------------
 autoPaly = True
-
+stop = False
 print('start.')
 time.sleep(1)
 
@@ -962,17 +1109,19 @@ while True:
         time.sleep(1)
         pic_click_one('./gametimeline/OK.png', confidence=0.7)
         print('status')
-        if pic_exists('./gametimeline/mark_waiting_game.png', confidence=0.7):
+        if get_lol_hwnd() is not None:
             print('open_game')
             open_game(lol_hwnd=get_lol_hwnd())
-        elif pic_exists('./gametimeline/In_game_logo.png', confidence=0.7):
-            init_Formation()
-            print('play_game = %d' % num, end=' ')
-            print(datetime.datetime.now().strftime("%Y--%m--%d %H:%M:%S"))
-            Game_Timeline(hero_list_init(), add_list_init(), normal_game_execute_list).run()
-            num = num + 1
         elif get_lol_client_hwnd() is not None:
-            print('loading')
+            if pic_exists('./gametimeline/In_game_logo.png', confidence=0.7):
+                init_Formation()
+                print('play_game = %d' % num, end=' ')
+                print(datetime.datetime.now().strftime("%Y--%m--%d %H:%M:%S"))
+                Game_Timeline(hero_list_init(), add_list_init(), normal_game_execute_list,
+                              hero_info_list=hero_info_list_init()).run()
+                num = num + 1
+            else:
+                print('loading')
         else:
             pic_click_one('./gametimeline/OK.png', confidence=0.7)
 
