@@ -38,6 +38,23 @@ def get_wegame_hwnd():
     return get_win_hwnd('WeGame')
 
 
+def get_start_game():
+    return get_win_hwnd("腾讯云游戏")
+
+
+def get_start():
+    return get_win_hwnd("START")
+
+
+def activate_hwnd(hwnd=None):
+    if hwnd is not None:
+        try:
+            hwnd.restore()
+            hwnd.activate()
+        except Exception:
+            pass
+
+
 def activate_client():
     try:
         lol_hwnd = get_lol_hwnd()
@@ -112,7 +129,7 @@ def dragTo(x2, y2, duration=0.2, startx=None, starty=None):
     pyautogui.dragTo(x2, y2, duration=duration)
 
 
-def click(x, y, button='left', duration=0.1):
+def click(x, y, button='left', duration=0.2):
     dec = random.randint(-2, 2)
     # 'left', 'middle', 'right'
     x += dec
@@ -199,7 +216,8 @@ def find_hero(hero_list, max_click=99999, region=None):
 
     for hero_data in hero_list:
         min_ = min(hero_data[num], max_click)
-        click_num = pic_click_all(hero_data[pic_path], min_, region=region, screenshotIm=screenshotIm)
+        click_num = pic_click_all(hero_data[pic_path], min_, region=region, screenshotIm=screenshotIm,
+                                  confidence=0.8)
         total += click_num
         hero_data[num] -= click_num
     try:
@@ -292,6 +310,12 @@ def open_game(lol_hwnd=None, wait_time=30, region=None):
         for i in range(3):
             click(box[0] + 202, box[1] + 14)
             time.sleep(0.5)
+
+
+def open_start_game():
+    start_hwnd = get_start()
+    if start_hwnd is not None:
+        pic_click_one('./start/my_game.png', confidence=0.7)
 
 
 def gg_game_(hero_list, game_timeline, max_click=99999, region=None):
@@ -398,7 +422,7 @@ class Game:
             game_timeline.check_list()
             # if game_timeline.is_base_init():
             game_timeline.pick_up()
-            game_timeline.swipe_sec()
+            # game_timeline.swipe_sec()
 
     def do(self, game_timeline):
         self.func(game_timeline)
@@ -414,7 +438,7 @@ class Game_Timeline:
                  hero_info_list=None, time_out=7200, is_pick_up=True):
         self.start_time = 0
         # 获取游戏内界面 对象
-        self.lol_client_hwnd = get_lol_client_hwnd()
+        self.lol_client_hwnd = get_start_game()
         # box 相关
         self.client_box = None
         if self.lol_client_hwnd is not None:
@@ -422,7 +446,8 @@ class Game_Timeline:
         else:
             self.client_box = [445, 121, 1024, 768]
         # 找牌 box
-        self.find_hero_box = [self.client_box[0] + 166, self.client_box[1] + 680, 724, 112]
+        self.find_hero_box = [self.client_box[0], self.client_box[1] + self.client_box[3] - 120,
+                              self.client_box[2], 120]
 
         self.hero_list = hero_list
         self.add_list = add_list
@@ -529,7 +554,7 @@ class Game_Timeline:
         x, y = pic_find_one('./gametimeline/draft.png', region=self.client_box)
         if x and y:
             if time.time() - self.last_draft_time > random.randint(1, 3):
-                right_click(self.client_box[0] + 345 + random.randint(0, 325),
+                right_click(self.client_box[0] + 468 + random.randint(0, 325),
                             self.client_box[1] + 259 + random.randint(0, 210))
                 self.last_draft_time = time.time()
             return True
@@ -602,12 +627,12 @@ class Game_Timeline:
         # return self.find_finish_list[self.add_x_end]
 
     def is_game_over(self):
-        x, y = pic_click_one('./gametimeline/drop_out.png', region=self.client_box)
+        x, y = pic_click_one('./gametimeline/drop_out.png', region=self.client_box, confidence=0.8)
         if x and y:
             return True
         # lol 游戏客户端消失 游戏结束
-        if get_lol_client_hwnd() is None:
-            return True
+        # if get_lol_client_hwnd() is None:
+        #     return True
         return False
 
     def swipe(self):
@@ -633,10 +658,10 @@ class Game_Timeline:
             result.add(Pos(b[0], b[1]))
         for pos in result:
             self.click_space()
-            x, y = pos.x + 25, pos.y + 53
-            pyautogui.mouseDown(x, y, button='right', duration=0.1)
+            x, y = pos.x + 25, pos.y + 50
+            pyautogui.mouseDown(x, y, button='right', duration=0.2)
             pyautogui.mouseUp(button='right')
-            time.sleep(0.4)
+            time.sleep(0.5)
             star_index = self.find_hero_info()
             if star_index is None:
                 self.sell_hero(x, y)
@@ -774,7 +799,9 @@ class Game_Timeline:
         return self.gold
 
     def ocr_gold(self):
-        gold_box = [self.client_box[0] + 432, self.client_box[1] + 646, 52, 34]
+        gold_box = [566, 584, 46, 26]
+        gold_box[0] += self.client_box[0]
+        gold_box[1] += self.client_box[1]
         return self.ocr(gold_box, gold_lib_list)
 
     def update_level(self):
@@ -792,7 +819,9 @@ class Game_Timeline:
         return self.level
 
     def ocr_level(self):
-        level_box = [self.client_box[0] + 21, self.client_box[1] + 648, 39, 24]
+        level_box = [177, 584, 35, 26]
+        level_box[0] += self.client_box[0]
+        level_box[1] += self.client_box[1]
         return self.ocr(level_box, level_lib_list)
 
     # 每次到达新的回合，sleep 1秒
@@ -810,7 +839,9 @@ class Game_Timeline:
         return None
 
     def ocr_draft(self):
-        draft_box = [self.client_box[0] + 365, self.client_box[1] + 25, 76, 27]
+        draft_box = [480, 0, 160, 26]
+        draft_box[0] += self.client_box[0]
+        draft_box[1] += self.client_box[1]
         return self.ocr(draft_box, draft_lib_list)
 
     @staticmethod
@@ -860,7 +891,7 @@ class Game_Timeline:
             self.click_space()
 
     def click_space(self, right=False):
-        click(self.client_box[0] + 140, self.client_box[1] + 460)
+        click(self.client_box[0] + 314, self.client_box[1] + 422)
         if right:
             click(self.client_box[0] + 140, self.client_box[1] + 460, button='right')
 
@@ -1042,14 +1073,10 @@ def init_Formation():
     Formation = fm
 
 
-# hero_num_list = [1, 1, 1, 1, 1, 1]
-
-
 hero_num_list = [3, 3, 3, 3, 3, 3]
 
 
 def add_list_init():
-    # return [[2, 2, 2, 2, 2, 2]]
     return [[0, 0, 0, 0, 0, 0]]
 
 
@@ -1095,36 +1122,37 @@ print('start.')
 time.sleep(1)
 
 mod_ = 1
-time_out = 60 * 20
+time_out = 60 * 11
 num = 1
 
 while True:
     while autoPaly:
-        ckeck_time()
-
-        activate_client()
 
         # 判断进入哪个分支
         #     open_game()
         time.sleep(1)
-        pic_click_one('./gametimeline/OK.png', confidence=0.7)
+        # pic_click_one('./gametimeline/OK.png', confidence=0.7)
         print('status')
-        if get_lol_hwnd() is not None:
+        start_game_hwnd = get_start_game()
+        if start_game_hwnd is None:
+            pass
+            # open_start_game()
+        activate_hwnd(start_game_hwnd)
+
+        if pic_exists('./gametimeline/mark_waiting_game.png', confidence=0.7):
             print('open_game')
             open_game(lol_hwnd=get_lol_hwnd())
-        elif get_lol_client_hwnd() is not None:
-            if pic_exists('./gametimeline/In_game_logo.png', confidence=0.7):
-                init_Formation()
-                print('play_game = %d' % num, end=' ')
-                print(datetime.datetime.now().strftime("%Y--%m--%d %H:%M:%S"))
-                Game_Timeline(hero_list_init(), add_list_init(), normal_game_execute_list,
-                              hero_info_list=hero_info_list_init()).run()
-                num = num + 1
-            else:
-                print('loading')
+        elif pic_exists('./gametimeline/In_game_logo.png', confidence=0.7):
+            init_Formation()
+            print('play_game = %d' % num, end=' ')
+            print(datetime.datetime.now().strftime("%Y--%m--%d %H:%M:%S"))
+            Game_Timeline(hero_list_init(), add_list_init(), normal_game_execute_list,
+                          hero_info_list=hero_info_list_init()).run()
+            num = num + 1
         else:
             pic_click_one('./gametimeline/OK.png', confidence=0.7)
+            print('loading')
 
-        time.sleep(3)
+        time.sleep(2)
 
     time.sleep(5)

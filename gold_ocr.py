@@ -1,10 +1,10 @@
 import os
-
+import random
 import numpy
 import pyautogui
 import time
 import pyscreeze
-import psutil
+# import psutil
 from PIL import Image
 import cv2
 
@@ -22,6 +22,14 @@ def get_win_hwnd(title):
 
 def get_lol_client_hwnd():
     return get_win_hwnd('League of Legends (TM) Client')
+
+
+def get_start_game():
+    return get_win_hwnd("腾讯云游戏")
+
+
+def get_start():
+    return get_win_hwnd("START")
 
 
 def ocr(box, font_library_path, show=False):
@@ -74,6 +82,41 @@ def ocr_2(box, font_library_path, show=False, threshold=[160, 190], confidence=0
     except Exception:
         pass
     return s
+
+
+def box_random_x_y(box):
+    w_start = box[0] + int(box[2] / 5)
+    w_end = box[0] + int(box[2] / 5) * 4
+    h_start = box[1] + int(box[3] / 5)
+    h_end = box[1] + int(box[3] / 5) * 4
+    return random.randint(w_start, w_end), random.randint(h_start, h_end)
+
+
+def pic_find_one(pic_path, confidence=0.95, grayscale=None, region=None):
+    x, y = (None, None)
+    try:
+        box = pyautogui.locateOnScreen(pic_path,
+                                       confidence=confidence,
+                                       grayscale=grayscale,
+                                       region=region)
+        x, y = box_random_x_y(box)
+    except Exception as e:
+        return x, y
+    return x, y
+
+
+def pic_click_one(pic_path, button='left', grayscale=None, region=None, confidence=0.95):
+    x, y = pic_find_one(pic_path, grayscale=grayscale, region=region, confidence=confidence)
+    if x and y:
+        click(x, y, button=button)
+    return x, y
+
+
+def pic_exists(pic_path, confidence=0.95, grayscale=None, region=None):
+    x, y = pic_find_one(pic_path, confidence=confidence, grayscale=grayscale, region=region)
+    if x and y:
+        return True
+    return False
 
 
 def box_pic(box):
@@ -202,14 +245,30 @@ def check_hero(box):
         time.sleep(0.7)
 
 
-def click(x, y):
-    pyautogui.mouseDown(x, y, duration=0.1)
-    pyautogui.mouseUp(x, y, duration=0.1)
+def click(x, y, button='left', duration=0.1):
+    dec = random.randint(-2, 2)
+    # 'left', 'middle', 'right'
+    x += dec
+    y += dec
+    # moveTo(x, y, duration=0.2)
+    pyautogui.mouseDown(x, y, button=button, duration=duration)
+    time.sleep(0.1)
+    pyautogui.mouseUp(button=button)
+
 
 time.sleep(2)
 
+# print(pic_exists('./gametimeline/mark_waiting_game.png', confidence=0.7))
+box = get_start_game().box
+# box_pic([box[0] + 480, box[1], 160, 26])  # 回合
+# box_pic([box[0] + 566, box[1] + 584, 44, 26])  # 金币
+# box_pic([box[0] + 177, box[1] + 584, 35, 26])  # 等级
 
-    # time.sleep(3)
+# box_pic()
+print(pic_click_one('./role/huabanxie.png',region=[box[0], box[1] + box[3] - 120, box[2], 120]
+                 ,confidence=0.8))
+# print(get_start())
+# time.sleep(3)
 # print(pyautogui.locateOnScreen('./role/T-xinghong.png', confidence=0.95))
 # li = []
 # for i in [965, 593], [921, 537], [964, 489], [1053, 593], [1005, 537], [1047, 489]:
