@@ -259,13 +259,13 @@ def click(x, y, button='left', duration=0.1):
 time.sleep(2)
 
 # print(pic_exists('./gametimeline/mark_waiting_game.png', confidence=0.7))
-box = get_start_game().box
+# box = get_start_game().box
 # box_pic([box[0] + 480, box[1], 160, 26])  # 回合
 # box_pic([box[0] + 566, box[1] + 584, 44, 26])  # 金币
 # box_pic([box[0] + 177, box[1] + 584, 35, 26])  # 等级
 
 # box_pic()
-print(pic_click_one('./role/huabanxie.png',region=[box[0], box[1] + box[3] - 120, box[2], 120]
+print(pic_exists('./role/roleinfo/paike.png'
                  ,confidence=0.8))
 # print(get_start())
 # time.sleep(3)
