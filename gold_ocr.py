@@ -206,9 +206,22 @@ def click(x, y):
     pyautogui.mouseDown(x, y, duration=0.1)
     pyautogui.mouseUp(x, y, duration=0.1)
 
-time.sleep(2)
+# print(pyautogui.locateOnScreen('./role/jiela.png'))
+
+while True:
+    print(pyautogui.locateOnScreen('./gametimeline/gold1.png',confidence=0.8))
+    time.sleep(1)
 
 
+
+# s1 = set()
+# s2 = set()
+# for filename in os.listdir('./role'):
+#     s1.add(filename)
+# for filename in os.listdir('./role/roleinfo'):
+#     s2.add(filename)
+# print(s1-s2)
+# print(s2-s1)
     # time.sleep(3)
 # print(pyautogui.locateOnScreen('./role/T-xinghong.png', confidence=0.95))
 # li = []
@@ -255,10 +268,12 @@ time.sleep(2)
 
 # box = pyautogui.locateOnScreen('./gametimeline/title.png')
 # if box:
-#     fight_box = [box[0] + 28, box[1] + 158, 890, 305]
-#     watch_box = [box[0] + 28, box[1] + 158 + 305, 890, 150]
-#     check_hero(fight_box)
-#     check_hero(watch_box)
+#     box_pic([ box[0]+365, box[1]+25, 76, 27 ])
+#     # fight_box = [box[0] + 28, box[1] + 158, 890, 305]
+#     # watch_box = [box[0] + 28, box[1] + 158 + 305, 890, 150]
+#     # check_hero(fight_box)
+#     # check_hero(watch_box)
+
 
 # a = set()
 #

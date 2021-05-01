@@ -1,11 +1,46 @@
 #时间范围内自动打代币
 run_time:
-  - start_time: [0,0 ]
+  - start_time: [ 0,0 ]
     end_time: [ 23,59 ]
-#是否前4投降
-is_rank4_surrender: False
-#快速找牌 间隔5秒
-fast_find_interval: 5
+
+friend_id_list: [  ] #'inininPP'
+
 #是否打排位模式   True   False
 choose_rank: False
-is_pick_up: True
+
+
+hero_num_list: [ 3, 3, 3, 3, 3, 3, 1, 1, 1 ]
+add_list: [ [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ] ]
+game_timeline:
+  #排名前x投降
+  is_rank_surrender: 2
+
+  #  box---------------------------------------------------------
+  #  选秀
+  draft_box: [ 345, 259, 325, 210 ]
+  #  找牌
+  find_hero_box: [ 166, 680, 724, 112 ]
+  rank_box: [ 900, 110, 124, 540 ]
+  fight_box: [ 30, 160, 890, 320 ]
+  watch_box: [ 30, 460, 890, 150 ]
+  gold_box: [ 432, 646, 52, 34 ]
+  level_box: [ 21, 648, 39, 24 ]
+  round_box: [ 365, 25, 90, 27 ]
+  #  ------------------------------------------------------------
+
+  #购买经验间隔
+  upgrade_interval: 1
+  #快速找牌 间隔5秒
+  fast_find_interval: 4
+  pick_up_interval: 5
+
+  hero_max_star_list: [ 3, 2, 2, 3, 2, 2, 1, 1, 1 ]
+  round_target_level: [ [ 27, 5 ],[ 33, 6 ],[ 45, 7 ],[ 57, 8 ],[ 67,9 ] ] #[ 21, 4 ], [ 25, 5 ],
+
+
+  #  上装备 相关------------------------------------------------------------------------
+  #  最小上装备回合
+  min_swipe_round: 33
+
+  #是否捡道具
+  is_pick_up: True

@@ -6,6 +6,7 @@ import keyboard
 import pyautogui
 import yaml
 import pyscreeze
+from PIL import Image
 
 import init_font_lib
 
@@ -13,6 +14,19 @@ level_lib_list = init_font_lib.init_level_lib_list()
 gold_lib_list = init_font_lib.init_gold_lib_list()
 draft_lib_list = init_font_lib.init_draft_lib_list()
 daibi_lib_list = init_font_lib.init_daibi_lib_list()
+
+
+def get_yaml_data(yaml_file):
+    # 打开yaml文件
+    print("***获取数据***")
+    file = open(yaml_file, 'r', encoding="utf-8")
+    file_data = file.read()
+    file.close()
+    data = yaml.load(file_data, Loader=yaml.FullLoader)
+    return data
+
+
+yaml_data = get_yaml_data('data.yaml')
 
 
 def get_win_hwnd(title):
@@ -118,7 +132,7 @@ def click(x, y, button='left', duration=0.1):
     x += dec
     y += dec
     # moveTo(x, y, duration=0.2)
-    pyautogui.mouseDown(x, y, button=button, duration=duration)
+    pyautogui.mouseDown(x, y, button=button)
     time.sleep(0.1)
     pyautogui.mouseUp(button=button)
 
@@ -246,7 +260,36 @@ def keep_online_click():
     click(10 + random.randint(0, 10), 10 + random.randint(0, 10))
 
 
-def open_game(lol_hwnd=None, wait_time=30, region=None):
+def add_friend():
+    id_list = yaml_data['friend_id_list']
+    if len(id_list) < 1:
+        return
+    pic_click_one('./client/yaoqing.png', confidence=0.9)
+    time.sleep(1)
+    click(1183, 638)
+    time.sleep(1)
+    lol_hwnd = get_lol_hwnd()
+    if lol_hwnd:
+        x, y = lol_hwnd.box[0] + 700, lol_hwnd.box[1] + 100
+    else:
+        x, y = 1031, 261
+    for id in id_list:
+        time.sleep(1)
+        click(x, y)
+        time.sleep(0.5)
+        slow_key_press('ctrl+a')
+        time.sleep(0.5)
+        slow_key_press('ctrl+x')
+        time.sleep(1)
+        keyboard.write(id)
+        time.sleep(1)
+        pic_click_one('./client/search_id.png', confidence=0.9)
+    time.sleep(1)
+    pic_click_one('./client/send.png', confidence=0.9)
+    time.sleep(15)
+
+
+def open_game(lol_hwnd=None, wait_time=60, region=None):
     if lol_hwnd is not None:
         region = lol_hwnd.box
         pass
@@ -266,7 +309,7 @@ def open_game(lol_hwnd=None, wait_time=30, region=None):
             './gametimeline/PvP.png',
             './gametimeline/choose_game_mode.png',
         ]
-        choose_rank = get_yaml_data('data.yaml')['choose_rank']
+        choose_rank = yaml_data['choose_rank']
         if choose_rank:
             list_.append('./gametimeline/choose_rank.png')
         else:
@@ -275,8 +318,9 @@ def open_game(lol_hwnd=None, wait_time=30, region=None):
 
         for pic_path in list_:
             pic_click_one(pic_path, region=region, confidence=0.7)
-            time.sleep(0.8)
+            time.sleep(0.7)
         time.sleep(2)
+        add_friend()
         x, y = pic_click_one('./gametimeline/search_game.png', confidence=0.7, region=region)
         if x and y:
             find = True
@@ -344,7 +388,7 @@ class Game:
 
     def exists_template(self, game_timeline):
         # if pic_exists(self.pic_path, confidence=0.95, region=region):
-        return self.name == game_timeline.draft
+        return self.name == game_timeline.round
 
     #     return True:继续执行   False：游戏结束
     def run(self, game_timeline):
@@ -363,11 +407,11 @@ class Game:
             if game_timeline.is_game_over():
                 return False
             # 前四名 则直接投降
-            if game_timeline.is_rank4_surrender and game_timeline.is_rank() <= 4:
-                print('前四')
+            if game_timeline.is_rank_surrender > 0 and game_timeline.is_rank() <= game_timeline.is_rank_surrender:
+                print('达到排名')
                 return False
             # 选秀阶段
-            if game_timeline.is_draft():
+            if game_timeline.is_opt_hero():
                 continue
 
             # 识别金币数量
@@ -375,30 +419,40 @@ class Game:
             # 识别等级
             game_timeline.update_level()
             # 识别回合
-            if game_timeline.update_draft() is not None:
-                if game_timeline.draft >= 26:
-                    game_timeline.check_watch_hero()
+            update_round = game_timeline.update_round()
 
-            if game_timeline.draft > self.name:
+            if game_timeline.round > self.name:
                 return True
 
-            # 找5费英雄
-            pic_click_all('./role/fee5.png', region=game_timeline.find_hero_box)
-            if game_timeline.gold >= 30 and game_timeline.level >= 8 and game_timeline.find_finish():
-                refresh_shop()
-                pic_click_all('./role/fee5.png', region=game_timeline.find_hero_box)
+            if game_timeline.gold >= 3:
+                gg_game_(game_timeline.hero_list, game_timeline)
+            game_timeline.check_list()
+
+            if update_round is not None:
+                game_timeline.click_space()
+                if pic_exists('./gametimeline/choose_props.png', region=game_timeline.client_box):
+                    # 正常装备 [540,700]   暗黑装备  [356,700]
+                    click(game_timeline.client_box[0] + 356, game_timeline.client_box[1] + 700)
+                if game_timeline.round >= 31:
+                    time.sleep(1)
+                    game_timeline.check_all_hero()
+
+            # # 找5费英雄
+            # pic_click_all('./role/fee5.png', region=game_timeline.find_hero_box)
+            # if game_timeline.gold >= 30 and game_timeline.level >= 8 and game_timeline.find_finish():
+            #     refresh_shop()
+            #     pic_click_all('./role/fee5.png', region=game_timeline.find_hero_box)
 
             self.keep_do(game_timeline)
 
             if self.exists_template(game_timeline):
                 self.do(game_timeline)
                 return True
-            if game_timeline.gold >= 5:
-                gg_game_(game_timeline.hero_list, game_timeline)
-            game_timeline.check_list()
+            game_timeline.check_level()
             # if game_timeline.is_base_init():
             game_timeline.pick_up()
-            game_timeline.swipe_sec()
+            if game_timeline.round >= game_timeline.min_swipe_round:
+                game_timeline.swipe_sec()
 
     def do(self, game_timeline):
         self.func(game_timeline)
@@ -415,20 +469,42 @@ class Game_Timeline:
         self.start_time = 0
         # 获取游戏内界面 对象
         self.lol_client_hwnd = get_lol_client_hwnd()
-        # box 相关
+        # box 相关------------------------------------------------------------------------------------------------
         self.client_box = None
         if self.lol_client_hwnd is not None:
             self.client_box = self.lol_client_hwnd.box
         else:
             self.client_box = [445, 121, 1024, 768]
+        client_x, client_y = self.client_box[0], self.client_box[1]
         # 找牌 box
-        self.find_hero_box = [self.client_box[0] + 166, self.client_box[1] + 680, 724, 112]
+        self.find_hero_box = self.add_Offset(yaml_data['game_timeline']['find_hero_box'], client_x, client_y)
+        # 选秀 box
+        self.opt_box = self.add_Offset(yaml_data['game_timeline']['draft_box'], client_x, client_y)
+        self.rank_box = self.add_Offset(yaml_data['game_timeline']['rank_box'], client_x, client_y)
+        self.fight_box = self.add_Offset(yaml_data['game_timeline']['fight_box'], client_x, client_y)
+        self.watch_box = self.add_Offset(yaml_data['game_timeline']['watch_box'], client_x, client_y)
 
+        self.gold_box = self.add_Offset(yaml_data['game_timeline']['gold_box'], client_x, client_y)
+        self.level_box = self.add_Offset(yaml_data['game_timeline']['level_box'], client_x, client_y)
+        self.round_box = self.add_Offset(yaml_data['game_timeline']['round_box'], client_x, client_y)
+        # -------------------------------------------------------------------------------------------------------
+
+        # 英雄信息
         self.hero_list = hero_list
+        self.hero_info_list = hero_info_list
+        self.hero_star_list = [0] * 20
+        self.hero_max_star_list = yaml_data['game_timeline']['hero_max_star_list']
+
+        # 英雄 数量相关
         self.add_list = add_list
+        self.add_x = 0
+        self.add_x_end = len(add_list)
+        self.find_finish_list = [False] * (len(add_list) + 1)
+
+        # 执行事件
         self.game_execute_list = game_execute_list
 
-        #         self.start_time = start_time
+        # self.start_time = start_time
         self.time_out = time_out if time_out > 0 else 7200
         # self.is_add = False
 
@@ -443,43 +519,33 @@ class Game_Timeline:
 
         self.is_empty = self.hero_list_is_empty()
 
-        # 英雄 数量相关
-        self.find_finish_list = []
-        self.add_x = 0
-        self.add_x_end = len(add_list)
-        for i in range(0, len(add_list)):
-            self.find_finish_list.append(False)
-        self.find_finish_list.append(False)
-
-        data = get_yaml_data('data.yaml')
-
         # 是否开启 捡道具
-        self.is_pick_up = data['is_pick_up']
+        self.is_pick_up = yaml_data['game_timeline']['is_pick_up']
         self.last_pick_up_time = 0
-
-        # 英雄详情信息
-        self.hero_info_list = hero_info_list
-
-        self.hero_star_list = [0] * 20
 
         # 上装备  相关
         self.props_index = 0
         self.last_swipe_props_time = 0
-        self.can_swipe_props = True
+        self.min_swipe_round = yaml_data['game_timeline']['min_swipe_round']
 
-        # 前四自动投降
-        self.is_rank4_surrender = data['is_rank4_surrender']
+        # 排名达到预期 则自动投降
+        self.is_rank_surrender = yaml_data['game_timeline']['is_rank_surrender']
         # 快速找牌的时间间隔
-        self.fast_find_interval = data['fast_find_interval']
+        self.fast_find_interval = yaml_data['game_timeline']['fast_find_interval']
+        # 购买经验间隔
+        self.upgrade_interval = yaml_data['game_timeline']['upgrade_interval']
+        # 捡道具时间间隔
+        self.pick_up_interval = yaml_data['game_timeline']['pick_up_interval']
 
         # 识别金币
         self.gold = 0
         # 识别等级
         self.level = 0
         # 识别回合 2-5   则用 数字25显示
-        self.draft = 0
+        self.round = 0
 
-    #         self.is_level_7 = False
+        # 目标回合 需要达到的等级
+        self.round_target_level = yaml_data['game_timeline']['round_target_level']
 
     def run(self):
         self.start_time = time.time()
@@ -492,15 +558,25 @@ class Game_Timeline:
         self.total_time_()
         return True
 
+    @staticmethod
+    def add_Offset(box, x, y):
+        if len(box) != 4:
+            raise Exception
+        return [box[0] + x, box[1] + y, box[2], box[3]]
+
     # 购买经验 有内置cd 5秒   并且只有在金币大于34的时候才会买经验
     def upgrade_champ(self):
-        if time.time() - self.last_upgrade_champ > 5 and self.gold >= 34:
+        if time.time() - self.last_upgrade_champ > self.upgrade_interval and self.gold >= 4:
             upgrade_champ()
             self.last_upgrade_champ = time.time()
 
     # 是否可以快速找牌  大于5金币才继续快速找牌
     def can_fast_find(self):
-        if time.time() - self.last_fast_find > self.fast_find_interval and self.gold >= 25:
+        if self.round < 33:
+            m = 50
+        else:
+            m = 25
+        if time.time() - self.last_fast_find > self.fast_find_interval and self.gold >= m:
             self.last_fast_find = time.time()
             return True
         return False
@@ -512,7 +588,7 @@ class Game_Timeline:
 
     def pick_up(self):
         # 3分钟 捡一次道具
-        if self.is_pick_up and time.time() - self.last_pick_up_time > 5:
+        if self.is_pick_up and time.time() - self.last_pick_up_time > self.pick_up_interval:
             pic_click_one('./gametimeline/pick.png', button='right', confidence=0.7, region=self.client_box)
             pic_click_one('./gametimeline/pick2.png', button='right', confidence=0.7, region=self.client_box)
             pic_click_one('./gametimeline/pick3.png', button='right', confidence=0.7, region=self.client_box)
@@ -525,23 +601,19 @@ class Game_Timeline:
         return False
 
     # 是否选秀阶段
-    def is_draft(self):
+    def is_opt_hero(self):
         x, y = pic_find_one('./gametimeline/draft.png', region=self.client_box)
         if x and y:
             if time.time() - self.last_draft_time > random.randint(1, 3):
-                right_click(self.client_box[0] + 345 + random.randint(0, 325),
-                            self.client_box[1] + 259 + random.randint(0, 210))
+                x, y = box_random_x_y(self.opt_box)
+                right_click(x, y)
                 self.last_draft_time = time.time()
             return True
         return False
 
     # 返回当前排名
     def is_rank(self):
-        box_list = pic_find_all('./gametimeline/hp0.png', confidence=0.95, region=self.client_box)
-        total = 0
-        for box in box_list:
-            total += 1
-        return 8 - total
+        return 8 - len(list(pic_find_all('./gametimeline/hp0.png', confidence=0.95, region=self.rank_box)))
 
     # 投降
     def surrender(self):
@@ -558,9 +630,6 @@ class Game_Timeline:
         return time.time() - self.start_time > self.time_out
 
     def hero_list_is_empty(self):
-        if time.time() - self.last_print_hero_list > 10:
-            print([[hero[0][hero[0].rindex('/') + 1:hero[0].rindex('.')], hero[1]] for hero in self.hero_list])
-            self.last_print_hero_list = time.time()
         for hero_data in self.hero_list:
             if hero_data[1] > 0:
                 return False
@@ -587,16 +656,22 @@ class Game_Timeline:
                     self.hero_list_add()
                     print('add. ' + str(self.add_x))
                     self.add_x = self.add_x + 1
+        if time.time() - self.last_print_hero_list > 10:
+            print([[hero[0][hero[0].rindex('/') + 1:hero[0].rindex('.')], hero[1]] for hero in self.hero_list])
+            print([star for star in self.hero_star_list[0:len(self.hero_list)]])
+            self.last_print_hero_list = time.time()
 
     def is_base_init(self):
         return self.find_finish_list[0]
 
     def find_finish(self):
         for i in range(len(self.hero_list)):
-            if self.hero_star_list[i] < 2:
+            if self.hero_star_list[i] < self.hero_max_star_list[i]:
                 # todo
                 if self.hero_list[i][1] <= 0:
                     self.hero_list[i][1] += 1
+        for i in range(len(self.hero_list)):
+            if self.hero_star_list[i] < self.hero_max_star_list[i]:
                 return False
         return True
         # return self.find_finish_list[self.add_x_end]
@@ -610,8 +685,10 @@ class Game_Timeline:
             return True
         return False
 
+    # todo 根据在场英雄血条上装备
     def swipe(self):
-        xy = random.choice(fighting_hero_xy_list)
+        # xy = random.choice(fighting_hero_xy_list)
+        xy = random.choice([[518, 472], [560, 416], [519, 365], [602, 368]])
         hero_x, hero_y = xy[0] + self.client_box[0], xy[1] + self.client_box[1]
         moveTo(x=props_xy_list[self.props_index][0] + self.client_box[0],
                y=props_xy_list[self.props_index][1] + self.client_box[1])
@@ -619,40 +696,62 @@ class Game_Timeline:
         self.props_index = (self.props_index + 1) % len(props_xy_list)
 
     def swipe_sec(self):
-        if time.time() - self.last_swipe_props_time > 35:
+        if time.time() - self.last_swipe_props_time > 30:
             for i in range(6):
                 self.swipe()
             self.last_swipe_props_time = time.time()
 
     # ----------------------------------------------------------------------------------------------
-    # 校验英雄
-    def check_hero(self, box):
+    @staticmethod
+    def find_hero_health_bar(box):
         box_list = pyautogui.locateAllOnScreen('./gametimeline/hero_health_bar.png', region=box, confidence=0.75)
         result = set()
         for b in box_list:
             result.add(Pos(b[0], b[1]))
+        return result
+
+    # index大于 人口时 找空位
+    def find_vacancy(self):
+        for i in range(self.level):
+            # 还没有该英雄  可以先上其他英雄
+            if self.hero_star_list[i] <= 0:
+                return i
+        return None
+
+    # 校验英雄
+    def check_hero(self, box):
+        result = self.find_hero_health_bar(box)
         for pos in result:
             self.click_space()
             x, y = pos.x + 25, pos.y + 53
             pyautogui.mouseDown(x, y, button='right', duration=0.1)
             pyautogui.mouseUp(button='right')
             time.sleep(0.4)
-            star_index = self.find_hero_info()
-            if star_index is None:
-                self.sell_hero(x, y)
+            star, index = self.find_hero_info()
+            if star is None:
+                pass
             else:
                 # 没有info界面
-                if star_index[0] == 0:
-                    pass
+                if index is None:
+                    self.sell_hero(x, y)
                 else:
-                    star = star_index[0]
-                    index = star_index[1]
-                    if star < self.hero_star_list[index]:
-                        self.sell_hero(x, y)
+                    # 如果 星级达到最大星级  则把 数量置为0
+                    if star == self.hero_max_star_list[index]:
+                        self.hero_list[index][1] = 0
                     self.hero_star_list[index] = max(self.hero_star_list[index], star)
-                    if index < len(fighting_hero_xy_list):
-                        dragTo(self.client_box[0] + fighting_hero_xy_list[index][0],
-                               self.client_box[1] + fighting_hero_xy_list[index][1])
+                    if self.hero_star_list[index] == self.hero_max_star_list[index] and star < self.hero_star_list[
+                        index]:
+                        self.sell_hero(x, y)
+                    elif index < len(fighting_hero_xy_list):
+                        if self.hero_star_list[index] == star:
+                            # if 人口不够
+                            if index >= self.level:
+                                # 找找空位
+                                index = self.find_vacancy()
+                            if index is not None:
+                                # todo 根据英雄位置
+                                dragTo(self.client_box[0] + fighting_hero_xy_list[index][0],
+                                       self.client_box[1] + fighting_hero_xy_list[index][1])
         self.click_space()
 
     def find_hero_info(self):
@@ -660,18 +759,17 @@ class Game_Timeline:
         star = self.find_star(screenshotIm)
         if star is None:
             # 没找到星级  表示没有info界面  不能判断是否卖掉英雄  只能返回true
-            return [0, -1]
-        index = 0
-        for hero_info in self.hero_info_list:
-            pos = locate(hero_info, screenshotIm, region=self.client_box)
+            return None, None
+        # index = 0
+        for index in range(len(self.hero_info_list)):
+            pos = locate(self.hero_info_list[index], screenshotIm, region=self.client_box)
             if pos is not None:
-                return [star, index]
-            index += 1
+                return star, index
         try:
             screenshotIm.fp.close()
         except AttributeError:
             pass
-        return None
+        return star, None
 
     def find_star(self, screenshotIm):
         for i in range(1, 4):
@@ -680,29 +778,32 @@ class Game_Timeline:
                 return i
         return None
 
-    def find_health_bar(self):
-        box_list = list(pyautogui.locateAllOnScreen('./gametimeline/hero_health_bar.png',
-                                                    region=self.client_box, confidence=0.8))
-        result = set()
-        for box in box_list:
-            result.add(Pos(box[0], box[1]))
-        return result
+    def check_fight_hero(self):
+        self.check_hero(self.fight_box)
 
     def check_watch_hero(self):
-        fight_box = [self.client_box[0] + 28, self.client_box[1] + 158, 890, 305]
-        watch_box = [self.client_box[0] + 28, self.client_box[1] + 158 + 305, 890, 150]
+        self.check_hero(self.watch_box)
+
+    def check_all_hero(self):
         self.check_hero(self.client_box)
+
+    # ----------------------------------------------------------------------------------------------
+    def check_level(self):
+        for rd, target_level in self.round_target_level:
+            if self.round >= rd and self.level < target_level:
+                self.upgrade_champ()
+                return
 
     # ----------------------------------------------------------------------------------------------
     # 根据 给的box, 在box中识别 lib_list中的图片 并转化未相应的字符
     # lib_list [ 图片，  找到图片后对应的字符 ]
     @staticmethod
-    def ocr(box, lib_list, show=False, confidence=0.95, convert_2_=False, threshold=[160, 190]):
+    def ocr(box, lib_list, show=False, confidence=0.95, threshold=None):
         pic = pyscreeze.screenshot(region=box)
         if show:
             pic.show()
 
-        if convert_2_:
+        if threshold:
             pic = Game_Timeline.convert_2(pic, threshold=threshold)
 
         list = []
@@ -749,8 +850,7 @@ class Game_Timeline:
             return None
         box = [box[0], box[1], 68, 68]
 
-        result = Game_Timeline.ocr(box, daibi_lib_list, show=False, convert_2_=True, threshold=[160, 190],
-                                   confidence=0.80)
+        result = Game_Timeline.ocr(box, daibi_lib_list, show=False, threshold=[160, 190], confidence=0.80)
         return Game_Timeline.str_to_int(result)
 
     @staticmethod
@@ -774,8 +874,7 @@ class Game_Timeline:
         return self.gold
 
     def ocr_gold(self):
-        gold_box = [self.client_box[0] + 432, self.client_box[1] + 646, 52, 34]
-        return self.ocr(gold_box, gold_lib_list)
+        return self.ocr(self.gold_box, gold_lib_list)
 
     def update_level(self):
         level = self.ocr_level()
@@ -784,34 +883,25 @@ class Game_Timeline:
             if lv > self.level:
                 self.level = lv
                 print('level: %d.' % self.level)
-                # 到达等级7  清空watch
-                # if self.level >= 7:
-                #     for pos in watch_hero_xy_list:
-                #         self.sell_hero(self.client_box[0] + pos[0], self.client_box[1] + pos[1])
-                #         time.sleep(0.3)
         return self.level
 
     def ocr_level(self):
-        level_box = [self.client_box[0] + 21, self.client_box[1] + 648, 39, 24]
-        return self.ocr(level_box, level_lib_list)
+        return self.ocr(self.level_box, level_lib_list)
 
-    # 每次到达新的回合，sleep 1秒
-    def update_draft(self):
-        draft = self.ocr_draft()
+    # 每次到达新的回合，sleep
+    def update_round(self):
+        draft = self.ocr_round()
         if draft is not None:
             d = self.str_to_int(draft)
-            if d > self.draft:
-                self.draft = d
+            if d > self.round:
+                self.round = d
                 time.sleep(2)
-                print('draft: %d-%d ' % (int(self.draft / 10), int(self.draft % 10)))
-                # print('新回合', end=' ')
-                # self.right_click_watch()
-                return self.draft
+                print('round: %d-%d ' % (int(self.round / 10), int(self.round % 10)))
+                return self.round
         return None
 
-    def ocr_draft(self):
-        draft_box = [self.client_box[0] + 365, self.client_box[1] + 25, 76, 27]
-        return self.ocr(draft_box, draft_lib_list)
+    def ocr_round(self):
+        return self.ocr(self.round_box, draft_lib_list)
 
     @staticmethod
     def str_to_int(s):
@@ -823,42 +913,6 @@ class Game_Timeline:
         return n
 
     # -----------------------------------------------------------------------------------------------------------
-    # 校验观赛席
-    def exists_hero_on_watch(self):
-        watch_box = [self.client_box[0] + 55, self.client_box[1] + 474, 831, 143]
-        # 用血条查找英雄位置
-        box_list = pyautogui.locateAllOnScreen('./gametimeline/hero_health_bar.png', region=watch_box, confidence=0.8)
-        x_list = []
-        for b in box_list:
-            x = b[0] + int(b[2] / 2) - self.client_box[0]
-            x_list.append(x)
-        x_list.sort()
-        # print(x_list)
-        visit_list = [False for i in range(9)]
-        visit_index_list = []
-        max_xy = 0
-        for x in x_list:
-            for j in range(9):
-                if abs(x - watch_hero_xy_list[j][0]) < 40:
-                    max_xy = max(abs(x - watch_hero_xy_list[j][0]), max_xy)
-                    if not visit_list[j]:
-                        visit_index_list.append(j)
-                    visit_list[j] = True
-        print('max_x: %d. ' % max_xy, end=' ')
-        visit_index_list.sort()
-        print(visit_index_list)
-
-        return visit_index_list
-
-    def right_click_watch(self):
-        visit_index_list = self.exists_hero_on_watch()
-        for index in visit_index_list:
-            x = watch_hero_xy_list[index][0] + self.client_box[0]
-            y = watch_hero_xy_list[index][1] + self.client_box[1]
-            right_click(x, y)
-            time.sleep(0.5)
-            self.click_space()
-
     def click_space(self, right=False):
         click(self.client_box[0] + 140, self.client_box[1] + 460)
         if right:
@@ -906,7 +960,6 @@ def func_keep_find(game_timeline):
 
 def func_keep_fast_find(game_timeline):
     if game_timeline.find_finish():
-        game_timeline.upgrade_champ()
         time.sleep(0.5)
         return True
     if game_timeline.can_fast_find():
@@ -918,67 +971,57 @@ def func_keep_fast_find(game_timeline):
 
 
 def func_wait_game_over(game_timeline):
-    print('游戏结束了')
-    pic_click_one("gametimeline/drop_out.png")
+    pass
 
 
 def func_1_3_normal(game_timeline):
-    pic_click_one('./role/fee1.png')
+    if len(game_timeline.find_hero_health_bar(game_timeline.client_box)) < 2:
+        pic_click_one('./role/fee1.png')
 
 
 def func_2_1_normal(game_timeline):
-    # if len(game_timeline.find_health_bar()) < 3:
-    # pic_click_one('./role/fee1.png')
+    # upgrade_champ()
     pass
 
 
 def func_2_5_normal(game_timeline):
-    time.sleep(2)
-    # clear_offline_role_1(game_timeline)
+    # upgrade_champ()
+    pass
 
 
 def func_2_7_normal(game_timeline):
-    time.sleep(2)
-    # clear_online_role_1(game_timeline)
-    upgrade_champ()
-    # gg_game_(game_timeline.hero_list, game_timeline)
-    # refresh_shop()
-    # gg_game_(game_timeline.hero_list, game_timeline)
+    pass
+
+
+def func_3_2_normal(game_timeline):
+    # upgrade_champ()
+    # upgrade_champ()
+    # upgrade_champ()
+    pass
 
 
 def func_3_3_normal(game_timeline):
-    time.sleep(2)
-    upgrade_champ()
-    upgrade_champ()
-    # upgrade_champ()
-    # upgrade_champ()
-    # gg_game_(game_timeline.hero_list, game_timeline)
-    # refresh_shop()
-    # gg_game_(game_timeline.hero_list, game_timeline)
-    # time.sleep(70)
     pass
 
 
 def func_3_5_normal(game_timeline):
-    time.sleep(2)
-    upgrade_champ()
-    # clear_offline_role_1(game_timeline)
     pass
 
 
 def func_3_7_normal(game_timeline):
-    time.sleep(1)
-    time.sleep(0.5)
+    pass
 
 
-def get_yaml_data(yaml_file):
-    # 打开yaml文件
-    print("***获取数据***")
-    file = open(yaml_file, 'r', encoding="utf-8")
-    file_data = file.read()
-    file.close()
-    data = yaml.load(file_data, Loader=yaml.FullLoader)
-    return data
+def func_4_2_normal(game_timeline):
+    # for i in range(6):
+    #     upgrade_champ()
+    pass
+
+
+def func_5_2_normal(game_timeline):
+    # for i in range(5):
+    #     upgrade_champ()
+    pass
 
 
 run_datetime_list = []
@@ -986,11 +1029,10 @@ run_datetime_list = []
 
 def init_run_datetime_list():
     global run_datetime_list
-    data_list = get_yaml_data('data.yaml')['run_time']
+    data_list = yaml_data['run_time']
     for data in data_list:
         start_h, start_m = data['start_time'][0], data['start_time'][1]
         end_h, end_m = data['end_time'][0], data['end_time'][1]
-
         run_datetime_list.append(Run_Time(datetime.time(start_h, start_m), datetime.time(end_h, end_m)))
 
 
@@ -1008,9 +1050,10 @@ normal_game_execute_list = [
     Game('./gametimeline/game_1_3.png', 13, func_1_3_normal, func_keep_find),
     Game('./gametimeline/game_2_1.png', 21, func_2_1_normal, func_keep_find),
     Game('./gametimeline/game_2_5.png', 25, func_2_5_normal, func_keep_find),
-    Game('./gametimeline/game_2_7.png', 27, func_2_7_normal, func_keep_find),
-    Game('./gametimeline/game_3_3.png', 33, func_3_3_normal, func_keep_find),
-    Game('./gametimeline/game_3_5.png', 35, func_3_5_normal, func_keep_find),
+    Game('./gametimeline/game_3_3.png', 32, func_3_2_normal, func_keep_fast_find),
+    Game('./gametimeline/game_3_3.png', 33, func_3_2_normal, func_keep_fast_find),
+    Game('./gametimeline/game_3_3.png', 42, func_4_2_normal, func_keep_fast_find),
+    Game('./gametimeline/game_3_3.png', 52, func_5_2_normal, func_keep_fast_find),
     Game('./gametimeline/drop_out.png', 999, func_wait_game_over, func_keep_fast_find)
 ]
 
@@ -1018,14 +1061,14 @@ hero_list = []
 add_list = []
 Formation = None
 
-choose_dir = []
-for filename in os.listdir(r'./role'):
-    if filename.startswith('choose'):
-        choose_dir.append(filename.split('.png')[0].split('-')[1])
-
 
 def init_Formation():
     global Formation
+    choose_dir = []
+    for filename in os.listdir(r'./role'):
+        if filename.startswith('choose'):
+            choose_dir.append(filename.split('.png')[0].split('-')[1])
+
     interim = [''] * 10
     formation_x = random.choice(choose_dir)
     print('choose-' + formation_x)
@@ -1042,15 +1085,11 @@ def init_Formation():
     Formation = fm
 
 
-# hero_num_list = [1, 1, 1, 1, 1, 1]
-
-
-hero_num_list = [3, 3, 3, 3, 3, 3]
+hero_num_list = yaml_data['hero_num_list']
 
 
 def add_list_init():
-    # return [[2, 2, 2, 2, 2, 2]]
-    return [[0, 0, 0, 0, 0, 0]]
+    return yaml_data['add_list']
 
 
 def hero_list_init():
@@ -1066,8 +1105,6 @@ def hero_info_list_init():
     hero_info_list = []
     for hero_name in Formation:
         hero_info_list.append('./role/roleinfo/' + hero_name + '.png')
-    hero_info_list.append('./role/roleinfo/fee5.png')
-    hero_info_list.append('./role/roleinfo/fee14.png')
     return hero_info_list
 
 
@@ -1080,14 +1117,16 @@ def hero_info_list_init():
 watch_hero_xy_list = [[124, 549], [215, 549], [301, 549], [385, 549], [466, 549], [550, 549], [633, 549], [717, 549],
                       [800, 549]]
 
-fighting_hero_xy_list = [[518, 472], [475, 419], [519, 365], [610, 474], [560, 416], [602, 368]]
-props_xy_list = [
-    [44, 567], [50, 544], [50, 529], [80, 507], [65, 475],
-    # [120, 506],   可能会点到英雄
-    [104, 475],
-    [71, 460], [111, 460], [142, 475]
+fighting_hero_xy_list = [
+    [518, 472], [560, 416], [475, 419],
+    [519, 365], [602, 368], [610, 474],
+    [693, 476], [650, 416], [686, 363]
 ]
-
+# fighting_hero_xy_list = [[518, 472], [560, 416], [688, 366], [775, 363], [700, 472], [790, 470]]
+# fighting_hero_xy_list = [[518, 472], [560, 416], [688, 366], [775, 363], [700, 472], [790, 470]]
+props_xy_list = [
+    [47, 549], [61, 503], [70, 460], [116, 475], [110, 465], [142, 475]
+]
 # ------------------------------------------------------------------------------------------------------------------
 autoPaly = True
 stop = False
@@ -1114,6 +1153,7 @@ while True:
             open_game(lol_hwnd=get_lol_hwnd())
         elif get_lol_client_hwnd() is not None:
             if pic_exists('./gametimeline/In_game_logo.png', confidence=0.7):
+                yaml_data = get_yaml_data('data.yaml')
                 init_Formation()
                 print('play_game = %d' % num, end=' ')
                 print(datetime.datetime.now().strftime("%Y--%m--%d %H:%M:%S"))
