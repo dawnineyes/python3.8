@@ -7,6 +7,7 @@ import pyscreeze
 import psutil
 from PIL import Image
 import cv2
+import keyboard
 
 
 def get_win_hwnd(title):
@@ -202,17 +203,43 @@ def check_hero(box):
         time.sleep(0.7)
 
 
+def slow_key_press(key, down_time=0.2):
+    keyboard.press(key)
+    time.sleep(down_time)
+    keyboard.release(key)
+    return True
+
+
 def click(x, y):
     pyautogui.mouseDown(x, y, duration=0.1)
     pyautogui.mouseUp(x, y, duration=0.1)
 
+# a = {i:set() for i in range(3)}
+# a[1].add(1)
+# a[1].add(2)
+# # a[1].add()
+# a[2] = set([1,3,4,5])
+#
+# print(a[1] | a[2])
+
+# print(numpy.sum(numpy.array([0,1,2,3,0,1,5,2,0,1,3])>0))
+
+
+# pyautogui.moveTo(100,100,2,pyautogui.easeOutQuad)
+
+# x,y = [[1,2],[3,4]][0]
+# print(x+y)
+#
+# print(2>=3>2)
+# print('asdasd1asdasd'.split('-'))
+# print('a-b-c-'.split('-'))
+dic = {}
+# print(dic['ap'])
 # print(pyautogui.locateOnScreen('./role/jiela.png'))
 
-while True:
-    print(pyautogui.locateOnScreen('./gametimeline/gold1.png',confidence=0.8))
-    time.sleep(1)
-
-
+# while True:
+#     print(pyautogui.locateOnScreen('./gametimeline/gold1.png',confidence=0.8))
+#     time.sleep(1)
 
 # s1 = set()
 # s2 = set()
@@ -222,7 +249,7 @@ while True:
 #     s2.add(filename)
 # print(s1-s2)
 # print(s2-s1)
-    # time.sleep(3)
+# time.sleep(3)
 # print(pyautogui.locateOnScreen('./role/T-xinghong.png', confidence=0.95))
 # li = []
 # for i in [965, 593], [921, 537], [964, 489], [1053, 593], [1005, 537], [1047, 489]:
@@ -266,9 +293,12 @@ while True:
 # get_lol_client_hwnd().activate()
 # time.sleep(1)
 
-# box = pyautogui.locateOnScreen('./gametimeline/title.png')
+# box = pyautogui.locateOnScreen('./gametimeline/title.png',confidence=0.9)
 # if box:
-#     box_pic([ box[0]+365, box[1]+25, 76, 27 ])
+#     b = [ 0, 300, 420, 320]
+#     b[0]+=box[0]
+#     b[1]+= box[1]
+#     box_pic(b)
 #     # fight_box = [box[0] + 28, box[1] + 158, 890, 305]
 #     # watch_box = [box[0] + 28, box[1] + 158 + 305, 890, 150]
 #     # check_hero(fight_box)

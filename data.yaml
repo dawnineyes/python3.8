@@ -3,29 +3,108 @@ run_time:
   - start_time: [ 0,0 ]
     end_time: [ 23,59 ]
 
-friend_id_list: [  ] #'inininPP'
+friend_id_list: [ ] #'inininPP'
 
 #是否打排位模式   True   False
 choose_rank: False
+
+Formation:
+  #  - [
+  #    { 'name': 'vn','pos': 21, 'max_star': 2, 'num': 3, 'props': [ 'ad','speed','baoji' ],
+  #      'tibu': { 'name': '' , 'max_star': 1, 'num': 1 }
+  #    },
+  #    { 'name': 'renma','pos': 1, 'max_star': 3, 'num': 3, 'props': [ 'hujia','mokang','hp' ] },
+  #    { 'name': 'langren','pos': 18, 'max_star': 3, 'num': 3, 'props': [ 'hujia','mokang','hp' ] },
+  #    { 'name': 'chuishi','pos': 22, 'max_star': 2, 'num': 3, 'props': [ 'hujia','mokang','hp' ] },
+  #    { 'name': 'weiketuo','pos': 23, 'max_star': 2, 'num': 3, 'props': [ 'ap','mp' ] },
+  #    { 'name': 'kate','pos': 26, 'max_star': 2, 'num': 3, 'props': [ 'ap','mp' ] },
+  #    { 'name': 'delaiwen','pos': 15, 'max_star': 2, 'num': 3, 'props': [ 'ad','speed','baoji' ] },
+  #    { 'name': 'ruizi','pos': 16, 'max_star': 2, 'num': 3, 'props': [ 'ap','mp' ] },
+  #    { 'name': 'pobaiwang','pos': 25, 'max_star': 1, 'num': 1, 'props': [ 'speed','ap' ] },
+  #  ]
+
+  #  - [
+  #    { 'name': 'weilusi','pos': 21, 'max_star': 2, 'num': 2, 'props': [ ],
+  #      'tibu_list': [ ]
+  #    },
+  #    { 'name': 'hanbing','pos': 26, 'max_star': 2, 'num': 3, 'props': ['ad-hp','mp-mokang' ],
+  #      'tibu_list': [ { 'name': 'vn' , 'max_star': 1, 'num': 2 } ]
+  #    },
+  #    { 'name': 'baoshi','pos': 11, 'max_star': 2, 'num': 3, 'props': ['mp-hp'],
+  #      'tibu_list': [ { 'name': 'chuishi' , 'max_star': 1, 'num': 2 } ]
+  #    },
+  #    { 'name': 'nuoshou','pos': 12, 'max_star': 2, 'num': 3, 'props': [  ],
+  #      'tibu_list': [ { 'name': 'taitan' , 'max_star': 1, 'num': 2 } ]
+  #    },
+  #    { 'name': 'moganna','pos': 10, 'max_star': 2, 'num': 3, 'props': ['ap-hp','hujia-ad' ],
+  #      'tibu_list': [ { 'name': 'langren' , 'max_star': 1, 'num': 2 } ]
+  #    },
+  #    { 'name': 'ruier','pos': 0, 'max_star': 2, 'num': 3, 'props': [ ],
+  #      'tibu_list': [ { 'name': 'seti' , 'max_star': 1, 'num': 2 } ]
+  #    },
+  #    { 'name': 'yuenan','pos': 27, 'max_star': 2, 'num': 3, 'props': [ 'speed-ap', 'mokang-ad' ],
+  #      'tibu_list': [ { 'name': 'vn' , 'max_star': 1, 'num': 2 } ]
+  #    },
+  #    { 'name': 'qianjue','pos': 20, 'max_star': 2, 'num': 3, 'props': [ ],
+  #      'tibu_list': [ { 'name': 'vn' , 'max_star': 1, 'num': 2 } ]
+  #    },
+  #  ]
+
+  - [
+    #      妖姬
+    #      梦魇     酒桶
+    #      皎月 --> 螳螂
+    #      冰女     狼人
+    #      莫甘娜
+    #      破败王   卡特
+    #      狗熊     瑞兹
+    #      小菊
+    { 'name': 'yaoji','pos': 25, 'max_star': 2, 'num': 3, 'props': [ 'ad-baoji','hujia+ad','ad+baoji-miss','mp+mp' ],
+      'tibu_list': [ ]
+    },
+    { 'name': 'mengyan','pos': 22, 'max_star': 2, 'num': 3, 'props': [ 'ad+mokang' ],
+      'tibu_list': [{ 'name': 'jiutong' , 'max_star': 1, 'num': 1 } ]
+    },
+    { 'name': 'jiaoyue','pos': 10, 'max_star': 2, 'num': 3, 'props': [ 'mp+hujia' ],
+      'tibu_list': [ { 'name': 'tanglang' , 'max_star': 1, 'num': 1 } ]
+    },
+    { 'name': 'bingnv','pos': 26, 'max_star': 2, 'num': 3, 'props': [ 'speed+speed' ],
+      'tibu_list': [ { 'name': 'langren' , 'max_star': 1, 'num': 1 } ]
+    },
+    { 'name': 'moganna','pos': 11 , 'max_star': 2, 'num': 3, 'props': [ 'ap+hp','hp+hp' ],
+      'tibu_list': [ ]
+    },
+    { 'name': 'pobaiwang','pos': 23, 'max_star': 1, 'num': 2, 'props': [ 'ad+mp','ad-mp-mp' ],
+      'tibu_list': [ { 'name': 'kate' , 'max_star': 1, 'num': 1 } ]
+    },
+    { 'name': 'gouxiong','pos': 18, 'max_star': 1, 'num': 2, 'props': [ ],
+      'tibu_list': [ { 'name': 'ruizi' , 'max_star': 1, 'num': 1 } ]
+    },
+    { 'name': 'xiaoju','pos': 17, 'max_star': 2, 'num': 3, 'props': [ ],
+      'tibu_list': [ ]
+    }
+  ]
 
 
 hero_num_list: [ 3, 3, 3, 3, 3, 3, 1, 1, 1 ]
 add_list: [ [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ] ]
 game_timeline:
   #排名前x投降
-  is_rank_surrender: 2
+  is_rank_surrender: 0
 
   #  box---------------------------------------------------------
   #  选秀
-  draft_box: [ 345, 259, 325, 210 ]
+  opt_box: [ 225, 170, 575, 410 ]
   #  找牌
   find_hero_box: [ 166, 680, 724, 112 ]
   rank_box: [ 900, 110, 124, 540 ]
   fight_box: [ 30, 160, 890, 320 ]
-  watch_box: [ 30, 460, 890, 150 ]
+  watch_box: [ 30, 475, 890, 85 ]
   gold_box: [ 432, 646, 52, 34 ]
   level_box: [ 21, 648, 39, 24 ]
   round_box: [ 365, 25, 90, 27 ]
+  props_box: [ 50, 340, 300, 320 ]
+  #  props_box: [ 40, 340, 530, 420 ]
   #  ------------------------------------------------------------
 
   #购买经验间隔
@@ -34,13 +113,16 @@ game_timeline:
   fast_find_interval: 4
   pick_up_interval: 5
 
-  hero_max_star_list: [ 3, 2, 2, 3, 2, 2, 1, 1, 1 ]
-  round_target_level: [ [ 27, 5 ],[ 33, 6 ],[ 45, 7 ],[ 57, 8 ],[ 67,9 ] ] #[ 21, 4 ], [ 25, 5 ],
+  #  round_target_level: [ [ 27, 5 ],[ 33, 6 ],[ 45, 7 ],[ 57, 8 ],[ 67,9 ] ] #[ 21, 4 ], [ 25, 5 ],
+  round_target_level: [ [ 21, 4 ],[ 25, 5 ],[ 32, 6 ],[ 42, 7 ],[ 57, 8 ] ] #[ 21, 4 ], [ 25, 5 ],
 
 
   #  上装备 相关------------------------------------------------------------------------
   #  最小上装备回合
-  min_swipe_round: 33
+  min_swipe_round: 31
+  min_sell_round: 31
+  can_fast_find_round: 33
 
+  upgrade_threshold: 24
   #是否捡道具
   is_pick_up: True
