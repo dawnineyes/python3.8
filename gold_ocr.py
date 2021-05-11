@@ -4,17 +4,35 @@ import numpy
 import pyautogui
 import time
 import pyscreeze
-import psutil
-from PIL import Image
+# import psutil
+# from PIL import Image
 import cv2
 import keyboard
+import random
 
 
-def get_win_hwnd(title):
+def equalStr(s1:str, s2:str):
+    return s1 == s2
+
+
+def startWith(s1:str, s2:str):
+    return s1.startswith(s2)
+
+
+def endsWith(s1:str, s2:str):
+    return s1.endswith(s2)
+
+
+def findStr(s1:str, s2:str):
+    return s1.find(s2)
+
+
+def get_win_hwnd(title, funcNum=1):
+    func = [startWith,equalStr,endsWith,findStr][funcNum]
     try:
         w = pyautogui.getWindowsWithTitle(title)
         for i in w:
-            if i.title == title:
+            if func(i.title, title):
                 return i
         return None
     except Exception as e:
@@ -214,6 +232,27 @@ def click(x, y):
     pyautogui.mouseDown(x, y, duration=0.1)
     pyautogui.mouseUp(x, y, duration=0.1)
 
+time.sleep(2)
+for c in 'asdasd':
+    slow_key_press(c)
+
+# hwnd = get_win_hwnd('Note',funcNum=3)
+# while True:
+#     try:
+#         print(hwnd.box)
+#     except Exception:
+#         print('hwnd is None')
+#     time.sleep(1)
+
+# print(1<1.5)
+# pyautogui.click(100,100)
+# a = [3,2,1,4,5,6,7,8,9]
+# a.remove(1)
+# print(a)
+# print(x, y)
+
+# for i in range(6, 5, -1):
+#     print(i)
 # a = {i:set() for i in range(3)}
 # a[1].add(1)
 # a[1].add(2)
@@ -233,7 +272,7 @@ def click(x, y):
 # print(2>=3>2)
 # print('asdasd1asdasd'.split('-'))
 # print('a-b-c-'.split('-'))
-dic = {}
+# dic = {}
 # print(dic['ap'])
 # print(pyautogui.locateOnScreen('./role/jiela.png'))
 

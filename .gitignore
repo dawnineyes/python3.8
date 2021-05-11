@@ -6,6 +6,11 @@ Thumbs.db:encryptable
 ehthumbs.db
 ehthumbs_vista.db
 
+
+a.txt
+b.txt
+xiaoshuo.py
+
 # Dump file
 *.stackdump
 
