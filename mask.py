@@ -13,7 +13,7 @@ def generate_alpha(alpha_channel, last_channel, curr_channel, confidence=0.999):
                 int(curr_channel[i, j]) - int(last_channel[i, j])) <= threshold else 0
 
 
-def qubeijing(sec_time, box, file_path_name, confidence=0.999):
+def qubeijing_for_time(sec_time, box, file_path_name, confidence=0.999):
     last_template = None
     alpha_channel = None
     start_time = time.time()
@@ -23,6 +23,27 @@ def qubeijing(sec_time, box, file_path_name, confidence=0.999):
         screenshotIm = pyscreeze.screenshot(region=region)
         template = pyscreeze._load_cv2(screenshotIm)
         close_screenshotIm(screenshotIm)
+        b_channel, g_channel, r_channel = cv2.split(template)
+        if alpha_channel is None:
+            alpha_channel = np.ones(b_channel.shape, dtype=b_channel.dtype) * 255
+        if last_template is not None:
+            b, g, r = cv2.split(last_template)
+            generate_alpha(alpha_channel, b_channel, b, confidence=confidence)
+            generate_alpha(alpha_channel, g_channel, g, confidence=confidence)
+            generate_alpha(alpha_channel, r_channel, r, confidence=confidence)
+        last_template = template
+    b_channel, g_channel, r_channel = cv2.split(last_template)
+    img_BGRA = cv2.merge((b_channel, g_channel, r_channel, alpha_channel))
+    # alpha = template[:,:,3]
+    cv2.imwrite(file_path_name, img_BGRA)
+
+
+def qubeijing_for_pic_list(pic_list, file_path_name, confidence=0.999):
+    last_template = None
+    alpha_channel = None
+    start_time = time.time()
+    for pic in pic_list:
+        template = pyscreeze._load_cv2(pic)
         b_channel, g_channel, r_channel = cv2.split(template)
         if alpha_channel is None:
             alpha_channel = np.ones(b_channel.shape, dtype=b_channel.dtype) * 255
@@ -64,6 +85,15 @@ def find_touming(path, confidence=0.95):
         return None
 
 
-# find_touming('mask3.png')
-# qubeijing(60,(870,500,1000,600),'mask.png')
+if __name__ == '__main__':
+    pic_list = [
+        './pic_rank/bobi.png',
+        './pic_rank/kelie.png',
+        './pic_rank/zhadanren.png',
+        './pic_rank/lulu.png',
+        './pic_rank/kainan.png',
+    ]
+    qubeijing_for_pic_list(pic_list, 'mask_2.png',confidence=0.95)
+
+    find_touming('mask_2.png')
 # ImageGrab.grab((870,500,1000,600)).show()

@@ -899,10 +899,10 @@ class Game_Timeline:
     pic_drop_out = load_pic('./gametimeline/drop_out.png')
 
     def is_game_over(self):
+        global formation_suggestion
         x, y = pic_find_one(self.pic_drop_out, region=self.client_box)
         if x and y:
             time.sleep(0.5)
-            global formation_suggestion
             rank = self.ocr_rank()
             formation_suggestion.record_rank(rank)
             print('---排名: ' + str(rank))
@@ -919,6 +919,7 @@ class Game_Timeline:
         # lol 游戏客户端消失 游戏结束 只有第一名才会直接结束
         if get_lol_client_hwnd() is None:
             # todo 记录排名  动态调整阵容
+            formation_suggestion.record_rank(2)
             return True
         return False
 
@@ -1508,14 +1509,19 @@ def probability(probability_list):
 last_formation_index = 0
 
 
-def init_Formation(formation_index=None):
+def init_Formation(formation_index=None, fast_8=False):
     global yaml_data, last_formation_index
     yaml_data = get_yaml_data('data.yaml')
     global formation
-    Formation_list = yaml_data['Formation']
-    formation_probability = yaml_data['formation_probability']
+    if fast_8:
+        Formation_list = yaml_data['Formation_fast_8']
+    else:
+        Formation_list = yaml_data['Formation']
+    formation_probability = []
+    for f in Formation_list:
+        formation_probability.append(f['probability'])
     formation_can_repeat = yaml_data['formation_can_repeat']
-    if formation_can_repeat:
+    if formation_can_repeat or fast_8:
         pass
     else:
         # 不与上一次的阵容重复
@@ -1526,7 +1532,8 @@ def init_Formation(formation_index=None):
     formation = Formation_list[index]['hero_dic_list']
     global Fm
     Fm = Formation(Formation_list[index])
-    last_formation_index = index
+    if fast_8 is False:
+        last_formation_index = index
     # 初始化阵容数据放到这个方法里面
     init_hero_dic_list()
 
@@ -1540,6 +1547,10 @@ def init_Formation(formation_index=None):
     for filename in os.listdir(r'./gametimeline/props'):
         name = filename.split('.png')[0]
         props_path_name_lsit.append([load_pic('./gametimeline/props/' + filename), name])
+    if fast_8:
+        print('fast_8, index = ' + str(index))
+    else:
+        print('normal, index = ' + str(index))
     return index
 
 
@@ -1581,7 +1592,7 @@ class Formation_Suggestion:
     default_rank = 4.5
 
     def __init__(self):
-        self.history_rank = [self.default_rank]
+        self.history_rank = [self.default_rank] * 2
         self.last_time = time.time()
 
     # 记录历史排名
@@ -1632,6 +1643,9 @@ class Formation_Suggestion:
         #     close_screenshotIm(screenshotIm)
         print('片哥个数:' + str(robot_num))
         return robot_num
+
+    def can_fast_8(self):
+        return self.history_rank[-2] <= 4 and self.history_rank[-1] > 4
 
     # 推荐阵容  todo 目前只会推荐 认真 和 速死
     def suggestion(self):
@@ -1734,10 +1748,10 @@ while True:
             if pic_exists('./gametimeline/In_game_logo.png', confidence=0.7):
                 print(formation_suggestion.history_rank)
                 os.system('taskkill /IM TenioDL.exe /F')
-                # init_Formation(formation_index=suggestion_index)
-                # print(formation)
                 # 初始化阵容数据
-                init_Formation()
+                can_fast_8 = formation_suggestion.can_fast_8()
+                # 上一把名次小于4 则这把速死 拉低胜率
+                init_Formation(fast_8=can_fast_8)
                 print(fighting_hero_xy_list)
                 print('play_game = %d' % num, end=' ')
                 print(datetime.datetime.now().strftime("%Y--%m--%d %H:%M:%S"))
@@ -1757,7 +1771,6 @@ while True:
     print('功能关闭中, F12 开启')
     time.sleep(5)
 
-# init_Formation()
 # g = Game_Timeline(normal_game_execute_list)
 # box = pyautogui.locateOnScreen('./gametimeline/title2.png',confidence=0.9)
 # wuqiku_box = yaml_data['game_timeline']['wuqiku_box']

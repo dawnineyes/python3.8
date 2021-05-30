@@ -14,7 +14,8 @@ formation_can_repeat: True
 formation_probability:
   - 0   #0  速死阵容    如果所有阵容优先级都为0  那么这个就是默认阵容          目前能用
   - 3   #6  6神盾             目前能用
-  - 0   #0  速死阵容
+  - 3   #1  绿巨人塞恩
+  - 2   #1  圣光维鲁斯
   - 0   #2  6破VN
   - 0   #1  魔女刺
   - 0   #0  魔女刺
@@ -22,10 +23,11 @@ formation_probability:
   - 0   #0  pdd
   - 0   #1  4屠龙6征服铁男
   - 0   #1  丧尸法
-  - 3   #0  测试专用阵容        目前能用
-  - 2   #1  圣光维鲁斯
-  - 3   #1  绿巨人塞恩
+  - 0   #0  测试专用阵容        目前能用
+
+
 Formation:
+  # 0   快速第8 默认阵容
   - {
     # 阵容优先级
     probability: 0,
@@ -45,9 +47,6 @@ Formation:
       { 'name': 'zhadanren','pos': 3, 'max_star': 1, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
         'tibu_list': [ ]
       },
-      { 'name': 'rinv','pos': 4, 'max_star': 1, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
-        'tibu_list': [ ]
-      },
       { 'name': 'huonan','pos': 5, 'max_star': 1, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
         'tibu_list': [ ]
       },
@@ -56,9 +55,10 @@ Formation:
       }
     ]
   }
+  # 3   6神盾
   - {
     # 阵容优先级
-    probability: 6,
+    probability: 3,
     # 阵容优先选择的装备
     props_priority: [ [ 'mokang',1 ],[ 'ad',1 ],[ 'ap',1 ],[ 'speed',1 ],[ 'mp',2 ],[ 'baoji-miss',1 ] ],
     # 主力输出
@@ -94,245 +94,47 @@ Formation:
       }
     ]
   }
-  - [
-    #      'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp'
-    { 'name': 'vn','pos': 1, 'max_star': 1, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'huabanxie','pos': 2 , 'max_star': 1, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'zhadanren','pos': 3, 'max_star': 1, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'rinv','pos': 4, 'max_star': 1, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'huonan','pos': 5, 'max_star': 1, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'weilusi','pos': 6, 'max_star': 1, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
-      'tibu_list': [ ]
-    }
-  ]
-  - [
-    { 'name': 'vn','pos': 26, 'max_star': 2, 'num': 3, 'props': [ 'miss-baoji+ap','ap-speed','speed+ap', 'speed+mokang','speed-mokang','ad+hp','ad-hp' ] ,
-      'tibu_list': [ ]
-    },
-    { 'name': 'renma','pos': 4, 'max_star': 2, 'num': 3, 'props': [ 'speed-hp','hujia+mp','mp-hujia','hp+hp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'ruizi','pos': 19, 'max_star': 2, 'num': 3, 'props': [ 'mp+mp' ],
-      'tibu_list': [ { 'name': 'langren' , 'max_star': 1, 'num': 2 } ]
-    },
-    { 'name': 'chuishi','pos': 13, 'max_star': 2, 'num': 3, 'props': [ ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'weiketuo','pos': 27, 'max_star': 2, 'num': 3, 'props': [ ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'pobaiwang','pos': 22, 'max_star': 1, 'num': 1, 'props': [ 'mp+hujia','mp-hujia','ad+mp','mp+mp' ],
-      'tibu_list': [ { 'name': 'kate' , 'max_star': 1, 'num': 2 } ]
-    },
-    { 'name': 'qianjue','pos': 25, 'max_star': 2, 'num': 3, 'props': [ ],
-      'tibu_list': [ { 'name': 'hanbing' , 'max_star': 1, 'num': 2 } ]
-    },
-    { 'name': 'ruier','pos': 5, 'max_star': 2, 'num': 3, 'props': [ ],
-      'tibu_list': [ ]
-    }
-  ]
-  - [
-    #      妖姬
-    #      梦魇     酒桶
-    #      皎月 --> 螳螂
-    #      冰女     狼人
-    #      莫甘娜
-    #      破败王   卡特
-    #      狗熊     瑞兹
-    #      小菊
-    { 'name': 'yaoji','pos': 25, 'max_star': 2, 'num': 3, 'props': [ 'ad-baoji','hujia+ad','ad+baoji-miss','mp+mp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'jiaoyue','pos': 10, 'max_star': 2, 'num': 3, 'props': [ 'mp+hujia' ],
-      'tibu_list': [ { 'name': 'tanglang' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'bingnv','pos': 26, 'max_star': 2, 'num': 3, 'props': [ 'ap+baoji-miss' ],
-      'tibu_list': [ { 'name': 'langren' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'moganna','pos': 11 , 'max_star': 2, 'num': 3, 'props': [ 'ap+hp','hp+hp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'mengyan','pos': 22, 'max_star': 2, 'num': 3, 'props': [ 'ad+mokang' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'pobaiwang','pos': 23, 'max_star': 1, 'num': 2, 'props': [ 'ad+mp','ad-mp' ],
-      'tibu_list': [ { 'name': 'kate' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'xiaoju','pos': 9, 'max_star': 2, 'num': 3, 'props': [ ],
-      'tibu_list': [ { 'name': 'jiutong' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'gouxiong','pos': 18, 'max_star': 1, 'num': 2, 'props': [ ],
-      'tibu_list': [ { 'name': 'ruizi' , 'max_star': 1, 'num': 1 } ]
-    }
-
-  ]
-  - [
-    { 'name': 'yaoji','pos': 26, 'max_star': 2, 'num': 3, 'props': [ 'mp+mokang' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'jiaoyue','pos': 10, 'max_star': 2, 'num': 3, 'props': [ 'mp+hujia' ],
-      'tibu_list': [ { 'name': 'tanglang' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'bingnv','pos': 25, 'max_star': 2, 'num': 3, 'props': [ 'mp+mp', 'baoji-miss+ap' ],
-      'tibu_list': [ { 'name': 'langren' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'moganna','pos': 11 , 'max_star': 2, 'num': 3, 'props': [ 'ap+hp','hp+hp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'mengyan','pos': 22, 'max_star': 2, 'num': 3, 'props': [ 'ad+mokang' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'pobaiwang','pos': 23, 'max_star': 1, 'num': 2, 'props': [ 'ad+mp','ad-mp' ],
-      'tibu_list': [ { 'name': 'kate' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'xiaoju','pos': 9, 'max_star': 2, 'num': 3, 'props': [ ],
-      'tibu_list': [ { 'name': 'jiutong' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'gouxiong','pos': 18, 'max_star': 1, 'num': 2, 'props': [ ],
-      'tibu_list': [ { 'name': 'ruizi' , 'max_star': 1, 'num': 1 } ]
-    }
-  ]
-  - [
-    { 'name': 'kelie','pos': 14, 'max_star': 2, 'num': 3, 'props': [ 'speed+hp','ad+mokang','hujia+hp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'zhadanren','pos': 21, 'max_star': 2, 'num': 3, 'props': [ 'mp+speed','mp+speed','baoji-miss+ap','mp+mp','ap+mp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'timo','pos': 23, 'max_star': 2, 'num': 3, 'props': [ 'mp+mp','ad+mp','ap+speed' ],
-      'tibu_list': [ { 'name': 'bobi' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'kainan','pos': 17 , 'max_star': 2, 'num': 3, 'props': [ 'ap+hp','hujia+ad' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'lulu','pos': 22, 'max_star': 2, 'num': 3, 'props': [ 'mp+mokang','ad+hp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'qianjue','pos': 15, 'max_star': 1, 'num': 2, 'props': [ 'ad+mp' ],
-      'tibu_list': [ { 'name': 'huonan' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'xiaoju','pos': 16, 'max_star': 2, 'num': 3, 'props': [ 'hp+hp','hujia+hp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'gouxiong','pos': 3, 'max_star': 2, 'num': 2, 'props': [ 'hujia+hujia' ],
-      'tibu_list': [ ]
-    }
-  ]
-  - [
-    #      'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp'
-    { 'name': 'jianmo','pos': 21, 'max_star': 1, 'num': 3, 'props': [ 'hujia+hp','hujia+hujia','mokang+mokang','speed+hp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'wudier','pos': 22 , 'max_star': 1, 'num': 3, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'jiutong','pos': 23, 'max_star': 1, 'num': 3, 'props': [ 'hujia+hp','hujia+hujia','mokang+mokang','speed+hp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'tanglang','pos': 24, 'max_star': 1, 'num': 3, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'langren','pos': 25, 'max_star': 1, 'num': 3, 'props': [ 'mp+mp','mokang+baoji-miss','mp+baoji-miss' ],
-      'tibu_list': [ ]
-    }
-  ]
-  - [
-    #      'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp'
-    { 'name': 'tienan','pos': 0, 'max_star': 2, 'num': 3, 'props': [ 'ad+ap','ad-ap','hp+hp','mokang+baoji-miss','mp+baoji-miss' ],
-      'tibu_list': [ { 'name': 'huabanxie' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'jumo','pos': 1 , 'max_star': 2, 'num': 3, 'props': [ 'ding+speed' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'pansen','pos': 2, 'max_star': 2, 'num': 3, 'props': [ 'ding+speed','ap+hujia','hujia+hp' ],
-      'tibu_list': [ { 'name': 'rinv' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'ruiwen','pos': 3, 'max_star': 2, 'num': 3, 'props': [ 'ad+baoji-miss' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'yasuo','pos': 4, 'max_star': 2, 'num': 3, 'props': [ 'ap+speed' ],
-      'tibu_list': [ { 'name': 'taitan' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'delaiwen','pos': 15, 'max_star': 2, 'num': 3, 'props': [ 'mokang+ad','ad+baoji-miss','speed+ap' ],
-      'tibu_list': [ { 'name': 'jianmo' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'jiaoyue','pos': 16, 'max_star': 2, 'num': 3, 'props': [ 'mp+hujia','ding+speed' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'tianshi','pos': 27, 'max_star': 1, 'num': 3, 'props': [ 'speed+ap','ad+ap' ],
-      'tibu_list': [ { 'name': 'huabanxie' , 'max_star': 1, 'num': 1 } ]
-    }
-  ]
-  - [
-    #      'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp'
-    { 'name': 'ruier','pos': 1, 'max_star': 2, 'num': 3, 'props': [ 'mokang+hujia' ],
-      'tibu_list': [ { 'name': 'langren' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'nunu','pos': 4 , 'max_star': 2, 'num': 3, 'props': [ 'mp+hujia','hp+hp','hujia+hujia' ],
-      'tibu_list': [ { 'name': 'seti' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'huonan','pos': 16, 'max_star': 2, 'num': 3, 'props': [ 'mp+mp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'ruizi','pos': 22, 'max_star': 2, 'num': 3, 'props': [ 'mp+mokang','mp+mokang' ],
-      'tibu_list': [ { 'name': 'huabanxie' , 'max_star': 1, 'num': 1 } ]
-    },
-    { 'name': 'weiketuo','pos': 15, 'max_star': 2, 'num': 3, 'props': [ ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'dayan','pos': 21, 'max_star': 2, 'num': 3, 'props': [ 'ad+mp','ad+ap','ap+baoji-miss' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'jiela','pos': 27, 'max_star': 2, 'num': 3, 'props': [ 'ap+hp' ],
-      'tibu_list': [ ]
-    },
-    { 'name': 'lakesi','pos': 23, 'max_star': 1, 'num': 3, 'props': [ 'speed','speed','speed','speed' ],
-      'tibu_list': [ { 'name': 'xindela' , 'max_star': 1, 'num': 1 } ]
-    }
-  ]
+  # 3   绿巨人塞恩
   - {
     # 阵容优先级
-    probability: 0,
+    probability: 3,
     # 阵容优先选择的装备
-    props_priority: [ [ 'ap',1 ],[ 'ap',2 ],[ 'hujia',3 ] ],
+    props_priority: [ [ 'baoji-miss',2 ],[ 'ad',2 ],[ 'speed',2 ],[ 'mokang',2 ],[ 'ap',3 ] ],
     # 主力输出
-    carry: [ 'vn','huonan' ],
+    carry: [ 'delaiwen' ],
     # 阵容英雄
     hero_dic_list: [
       #      'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp'
-      { 'name': 'vn','pos': 1, 'max_star': 2, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
+      { 'name': 'huabanxie','pos': 21, 'max_star': 2, 'num': 3, 'props': [ 'ad+baoji-miss' ],
         'tibu_list': [ ]
       },
-      { 'name': 'huabanxie','pos': 2 , 'max_star': 2, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
+      { 'name': 'huonan','pos': 22 , 'max_star': 2, 'num': 3, 'props': [ 'baoji-miss+mp','ad+mokang' ],
         'tibu_list': [ ]
       },
-      { 'name': 'zhadanren','pos': 3, 'max_star': 2, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
+      { 'name': 'nunu','pos': 0, 'max_star': 2, 'num': 3, 'props': [ 'speed+mokang' ],
         'tibu_list': [ ]
       },
-      { 'name': 'rinv','pos': 4, 'max_star': 2, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
+      { 'name': 'gouxiong','pos': 3, 'max_star': 2, 'num': 3, 'props': [ 'hujia+hujia' ],
+        'tibu_list': [ { 'name': 'jiutong' , 'max_star': 1, 'num': 1 } ]
+      },
+      { 'name': 'langren','pos': 2, 'max_star': 2, 'num': 3, 'props': [ ],
         'tibu_list': [ ]
       },
-      { 'name': 'huonan','pos': 5, 'max_star': 2, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
+      { 'name': 'seti','pos': 1, 'max_star': 2, 'num': 3, 'props': [ ],
         'tibu_list': [ ]
       },
-      { 'name': 'weilusi','pos': 6, 'max_star': 2, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
+      { 'name': 'ruizi','pos': 23, 'max_star': 2, 'num': 3, 'props': [ 'ap+hp','mp+mp' ],
+        'tibu_list': [ ]
+      },
+      { 'name': 'delaiwen','pos': 7, 'max_star': 2, 'num': 3, 'props': [ 'ad+mokang','ad+baoji-miss','speed+ap','speed+speed' ],
         'tibu_list': [ ]
       }
     ]
   }
+  # 2   圣光维鲁斯
   - {
     # 阵容优先级
-    probability: 0,
+    probability: 2,
     # 阵容优先选择的装备
     props_priority: [ [ 'speed',2 ],[ 'ap',2 ],[ 'mokang',2 ] ],
     # 主力输出
@@ -349,55 +151,165 @@ Formation:
       { 'name': 'hanbing','pos': 22, 'max_star': 2, 'num': 3, 'props': [ 'ap+speed','ad+mp','ad+hp' ],
         'tibu_list': [ { 'name': 'vn' , 'max_star': 1, 'num': 1 } ]
       },
-      { 'name': 'chuishi','pos': 14, 'max_star': 2, 'num': 3, 'props': [  ],
+      { 'name': 'chuishi','pos': 14, 'max_star': 2, 'num': 3, 'props': [ ],
         'tibu_list': [ ]
       },
-      { 'name': 'taitan','pos': 16, 'max_star': 2, 'num': 3, 'props': [  ],
+      { 'name': 'taitan','pos': 16, 'max_star': 2, 'num': 3, 'props': [ ],
         'tibu_list': [ ]
       },
       { 'name': 'baoshi','pos': 15, 'max_star': 2, 'num': 3, 'props': [ 'mp+hp' ],
         'tibu_list': [ { 'name': 'bobi' , 'max_star': 1, 'num': 1 } ]
       },
-      { 'name': 'lakesi','pos': 23, 'max_star': 2, 'num': 3, 'props': [  ],
+      { 'name': 'lakesi','pos': 23, 'max_star': 2, 'num': 3, 'props': [ ],
         'tibu_list': [ { 'name': 'xindela' , 'max_star': 1, 'num': 1 } ]
       },
-      { 'name': 'nuoshou','pos': 7, 'max_star': 2, 'num': 3, 'props': [  ],
+      { 'name': 'nuoshou','pos': 7, 'max_star': 2, 'num': 3, 'props': [ ],
         'tibu_list': [ ]
       }
     ]
   }
+  # 0   破败VN
   - {
     # 阵容优先级
     probability: 0,
     # 阵容优先选择的装备
-    props_priority: [ [ 'baoji-miss',2 ],[ 'ad',2 ],[ 'speed',2 ],[ 'mokang',2 ],['ap',3] ],
+    props_priority: [ [ 'speed',2 ],[ 'ap',2 ],[ 'mokang',2 ] ],
     # 主力输出
-    carry: [ 'delaiwen' ],
+    carry: [ 'vn' ],
+    # 阵容英雄
+    hero_dic_list: [
+      { 'name': 'vn','pos': 26, 'max_star': 2, 'num': 3, 'props': [ 'miss-baoji+ap','ap-speed','speed+ap', 'speed+mokang','speed-mokang','ad+hp','ad-hp' ] ,
+        'tibu_list': [ ]
+      },
+      { 'name': 'renma','pos': 4, 'max_star': 2, 'num': 3, 'props': [ 'speed-hp','hujia+mp','mp-hujia','hp+hp' ],
+        'tibu_list': [ ]
+      },
+      { 'name': 'ruizi','pos': 19, 'max_star': 2, 'num': 3, 'props': [ 'mp+mp' ],
+        'tibu_list': [ { 'name': 'langren' , 'max_star': 1, 'num': 2 } ]
+      },
+      { 'name': 'chuishi','pos': 13, 'max_star': 2, 'num': 3, 'props': [ ],
+        'tibu_list': [ ]
+      },
+      { 'name': 'weiketuo','pos': 27, 'max_star': 2, 'num': 3, 'props': [ ],
+        'tibu_list': [ ]
+      },
+      { 'name': 'pobaiwang','pos': 22, 'max_star': 1, 'num': 1, 'props': [ 'mp+hujia','mp-hujia','ad+mp','mp+mp' ],
+        'tibu_list': [ { 'name': 'kate' , 'max_star': 1, 'num': 2 } ]
+      },
+      { 'name': 'qianjue','pos': 25, 'max_star': 2, 'num': 3, 'props': [ ],
+        'tibu_list': [ { 'name': 'hanbing' , 'max_star': 1, 'num': 2 } ]
+      },
+      { 'name': 'ruier','pos': 5, 'max_star': 2, 'num': 3, 'props': [ ],
+        'tibu_list': [ ]
+      }
+    ]
+  }
+  # 0   魔女妖姬
+  - {
+    # 阵容优先级
+    probability: 0,
+    # 阵容优先选择的装备
+    props_priority: [ [ 'mp',2 ],[ 'ad',2 ],[ 'baoji-miss',1 ],[ 'hujia',1 ] ],
+    # 主力输出
+    carry: [ 'yaoji' ],
+    # 阵容英雄
+    hero_dic_list: [
+      #      妖姬
+      #      梦魇     酒桶
+      #      皎月 --> 螳螂
+      #      冰女     狼人
+      #      莫甘娜
+      #      破败王   卡特
+      #      狗熊     瑞兹
+      #      小菊
+      { 'name': 'yaoji','pos': 25, 'max_star': 2, 'num': 3, 'props': [ 'ad-baoji','hujia+ad','ad+baoji-miss','mp+mp' ],
+        'tibu_list': [ ]
+      },
+      { 'name': 'jiaoyue','pos': 10, 'max_star': 2, 'num': 3, 'props': [ 'mp+hujia' ],
+        'tibu_list': [ { 'name': 'tanglang' , 'max_star': 1, 'num': 1 } ]
+      },
+      { 'name': 'bingnv','pos': 26, 'max_star': 2, 'num': 3, 'props': [ 'ap+baoji-miss' ],
+        'tibu_list': [ { 'name': 'langren' , 'max_star': 1, 'num': 1 } ]
+      },
+      { 'name': 'moganna','pos': 11 , 'max_star': 2, 'num': 3, 'props': [ 'ap+hp','hp+hp' ],
+        'tibu_list': [ ]
+      },
+      { 'name': 'mengyan','pos': 22, 'max_star': 2, 'num': 3, 'props': [ 'ad+mokang' ],
+        'tibu_list': [ ]
+      },
+      { 'name': 'pobaiwang','pos': 23, 'max_star': 1, 'num': 2, 'props': [ 'ad+mp','ad-mp' ],
+        'tibu_list': [ { 'name': 'kate' , 'max_star': 1, 'num': 1 } ]
+      },
+      { 'name': 'xiaoju','pos': 9, 'max_star': 2, 'num': 3, 'props': [ ],
+        'tibu_list': [ { 'name': 'jiutong' , 'max_star': 1, 'num': 1 } ]
+      },
+      { 'name': 'gouxiong','pos': 18, 'max_star': 1, 'num': 2, 'props': [ ],
+        'tibu_list': [ { 'name': 'ruizi' , 'max_star': 1, 'num': 1 } ]
+      }
+
+    ]
+  }
+  # 0   5小恶魔
+  - {
+    # 阵容优先级
+    probability: 0,
+    # 阵容优先选择的装备
+    props_priority: [ [ 'mp',3 ],[ 'speed',2 ],[ 'ap',2 ] ],
+    # 主力输出
+    carry: [ 'timo','zhadanren' ],
+    # 阵容英雄
+    hero_dic_list: [
+      { 'name': 'kelie','pos': 14, 'max_star': 2, 'num': 3, 'props': [ 'speed+hp','ad+mokang','hujia+hp' ],
+        'tibu_list': [ ]
+      },
+      { 'name': 'zhadanren','pos': 21, 'max_star': 2, 'num': 3, 'props': [ 'mp+speed','mp+speed','baoji-miss+ap','mp+mp','ap+mp' ],
+        'tibu_list': [ ]
+      },
+      { 'name': 'timo','pos': 23, 'max_star': 2, 'num': 3, 'props': [ 'mp+mp','ad+mp','ap+speed' ],
+        'tibu_list': [ { 'name': 'bobi' , 'max_star': 1, 'num': 1 } ]
+      },
+      { 'name': 'kainan','pos': 17 , 'max_star': 2, 'num': 3, 'props': [ 'ap+hp','hujia+ad' ],
+        'tibu_list': [ ]
+      },
+      { 'name': 'lulu','pos': 22, 'max_star': 2, 'num': 3, 'props': [ 'mp+mokang','ad+hp' ],
+        'tibu_list': [ ]
+      },
+      { 'name': 'qianjue','pos': 15, 'max_star': 1, 'num': 2, 'props': [ 'ad+mp' ],
+        'tibu_list': [ { 'name': 'huonan' , 'max_star': 1, 'num': 1 } ]
+      },
+      { 'name': 'xiaoju','pos': 16, 'max_star': 2, 'num': 3, 'props': [ 'hp+hp','hujia+hp' ],
+        'tibu_list': [ ]
+      },
+      { 'name': 'gouxiong','pos': 3, 'max_star': 2, 'num': 2, 'props': [ 'hujia+hujia' ],
+        'tibu_list': [ ]
+      }
+    ]
+  }
+
+Formation_fast_8:
+  - {
+    # 阵容优先级
+    probability: 2,
+    # 阵容优先选择的装备
+    props_priority: [ [ 'ap',1 ],[ 'ap',2 ],[ 'hujia',3 ] ],
+    # 主力输出
+    carry: [ 'vn','huonan' ],
     # 阵容英雄
     hero_dic_list: [
       #      'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp'
-      { 'name': 'huabanxie','pos': 21, 'max_star': 2, 'num': 3, 'props': [ 'ad+baoji-miss' ],
+      { 'name': 'vn','pos': 1, 'max_star': 1, 'num': 2, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
         'tibu_list': [ ]
       },
-      { 'name': 'huonan','pos': 22 , 'max_star': 2, 'num': 3, 'props': [ 'baoji-miss+mp','ad+mokang' ],
-        'tibu_list': [  ]
-      },
-      { 'name': 'nunu','pos': 0, 'max_star': 2, 'num': 3, 'props': [ 'speed+mokang' ],
-        'tibu_list': [  ]
-      },
-      { 'name': 'gouxiong','pos': 3, 'max_star': 2, 'num': 3, 'props': [ 'hujia+hujia' ],
-        'tibu_list': [ { 'name': 'jiutong' , 'max_star': 1, 'num': 1 } ]
-      },
-      { 'name': 'langren','pos': 2, 'max_star': 2, 'num': 3, 'props': [  ],
+      { 'name': 'huabanxie','pos': 2 , 'max_star': 2, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
         'tibu_list': [ ]
       },
-      { 'name': 'seti','pos': 1, 'max_star': 2, 'num': 3, 'props': [  ],
+      { 'name': 'zhadanren','pos': 3, 'max_star': 2, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
         'tibu_list': [ ]
       },
-      { 'name': 'ruizi','pos': 23, 'max_star': 2, 'num': 3, 'props': [ 'ap+hp','mp+mp' ],
+      { 'name': 'huonan','pos': 5, 'max_star': 2, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
         'tibu_list': [ ]
       },
-      { 'name': 'delaiwen','pos': 7, 'max_star': 2, 'num': 3, 'props': [ 'ad+mokang','ad+baoji-miss','speed+ap','speed+speed' ],
+      { 'name': 'weilusi','pos': 6, 'max_star': 2, 'num': 1, 'props': [ 'ad','ap','hujia','mokang','baoji-miss','speed','mp','hp' ],
         'tibu_list': [ ]
       }
     ]
