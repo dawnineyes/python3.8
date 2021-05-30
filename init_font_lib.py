@@ -1,9 +1,19 @@
 import os
+import pyscreeze
+
+
+def load_pic(path: str):
+    src = None
+    try:
+        src = pyscreeze._load_cv2(path)
+    except Exception:
+        print('加载资源出错: ' + path)
+    return src
 
 
 def init_lib(list, lib_path):
     for filename in os.listdir(lib_path):
-        list.append([lib_path + filename, filename[:filename.rindex('.')]])
+        list.append([load_pic(lib_path + filename), filename[:filename.rindex('.')]])
 
 
 def init_level_lib_list():
@@ -34,3 +44,10 @@ def init_daibi_lib_list():
     daibi_lib_path = './client/daibi/'
     init_lib(daibi_lib_list, daibi_lib_path)
     return daibi_lib_list
+
+
+def init_rank_lib_list():
+    rank_lib_list = []
+    rank_lib_path = './gametimeline/rank/'
+    init_lib(rank_lib_list,rank_lib_path)
+    return rank_lib_list

@@ -10,25 +10,27 @@ import cv2
 import keyboard
 import random
 
+from PIL import Image
 
-def equalStr(s1:str, s2:str):
+
+def equalStr(s1: str, s2: str):
     return s1 == s2
 
 
-def startWith(s1:str, s2:str):
+def startWith(s1: str, s2: str):
     return s1.startswith(s2)
 
 
-def endsWith(s1:str, s2:str):
+def endsWith(s1: str, s2: str):
     return s1.endswith(s2)
 
 
-def findStr(s1:str, s2:str):
+def findStr(s1: str, s2: str):
     return s1.find(s2)
 
 
 def get_win_hwnd(title, funcNum=1):
-    func = [startWith,equalStr,endsWith,findStr][funcNum]
+    func = [startWith, equalStr, endsWith, findStr][funcNum]
     try:
         w = pyautogui.getWindowsWithTitle(title)
         for i in w:
@@ -80,8 +82,9 @@ def ocr_2(box, font_library_path, show=False, threshold=[160, 190], confidence=0
     for filename in os.listdir(font_library_path):
         points = tuple(pyscreeze.locateAll(font_library_path + filename, pic, confidence=confidence))
         if len(points):
+            s = filename[:filename.rindex('.')]
             for point in points:
-                list.append((point[0], filename[:filename.rindex('.')]))
+                list.append((point[0], s))
     list.sort()
     s = ''
     for n in list:
@@ -97,8 +100,8 @@ def ocr_2(box, font_library_path, show=False, threshold=[160, 190], confidence=0
 
 def box_pic(box):
     pic = pyscreeze.screenshot(region=box)
-    pic.show()
-    pic.save('./daibi.png')
+    # pic.show()
+    pic.save('./robot.png')
     try:
         pic.fp.close()
     except Exception:
@@ -232,10 +235,50 @@ def click(x, y):
     pyautogui.mouseDown(x, y, duration=0.1)
     pyautogui.mouseUp(x, y, duration=0.1)
 
-time.sleep(2)
-for c in 'asdasd':
-    slow_key_press(c)
 
+# box = pyautogui.locateOnScreen('./gametimeline/title2.png',confidence=0.95)
+# box = [box[0],box[1],1026,795]
+# print(len(list(pyautogui.locateAllOnScreen('./gametimeline/robot_mark.png',region=box,confidence=0.95))))
+# h_list = [[370, 384], [754, 768]]
+# w_list = [[120, 292], [325, 498], [530, 702], [734, 906]]
+#
+# # screenshotIm = pyscreeze.screenshot(region=box)
+# for h_start, h_end in h_list:
+#     for w_start, w_end in w_list:
+#         t_box = [w_start+box[0],
+#                  h_start+box[1],
+#                  w_end-w_start,h_end-h_start]
+#         box_pic(t_box)
+#         sss = ocr_2(None, './gametimeline/robot/', show=False, confidence=0.95,
+#                     pic_path='./robot.png',threshold=[150, 255])
+#         print(sss)
+# # screenshotIm.fp.close()
+
+
+# time.sleep(2)
+# for c in 'asdasd':
+#     slow_key_press(c)
+
+
+# convert_2(Image.open('./gametimeline/wuqiku/mokang - 副本.png'),threshold=[150, 255]).show()
+# convert_2(Image.open('./pic_rank/7_.png'),threshold=[160, 190]).save('./pic_rank/7.png')
+
+# sss = ocr_2(None, './gametimeline/rank/', show=False, confidence=0.95,
+#       pic_path='./pic_rank/1622441224.2648828.png')
+# print(sss)
+
+# from deeplearning import Game_Timeline
+#
+# print(Game_Timeline.ocr_rank())
+
+
+
+# aa = [1,2,3,4]
+# limit = 2
+# print(aa[-limit:])
+# box = get_lol_client_hwnd().box
+# # pyscreeze.screenshot(region=box).show()
+# pyautogui.moveTo(box[0]+423,376+box[1])
 # hwnd = get_win_hwnd('Note',funcNum=3)
 # while True:
 #     try:
